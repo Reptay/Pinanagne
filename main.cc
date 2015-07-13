@@ -10,7 +10,9 @@ int main(int argc, char* argv[])
   if (img.data)
   {
    BlueRedFilter(img);
-   getContour(img);
+   //getContour(img);
+   getOrientation(img);
+   
    namedWindow("Display", WINDOW_AUTOSIZE);
    imshow("Display", img);
    waitKey(0);
