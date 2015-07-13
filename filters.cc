@@ -85,7 +85,7 @@ void To_TSV(Mat img)
 	cvtColor(img, img, CV_BGR2HSV, 0);
 }
 
-void getContour(Mat img)
+void getContour(Mat& img)
 {
-	findContours(img,, 
+	Canny(img,img,10,1000,3);
 }

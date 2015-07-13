@@ -12,5 +12,6 @@ using namespace std;
 void RedFilter(Mat img);
 void BlueFilter(Mat img);
 void BlueRedFilter(Mat img);
+void getContour(Mat& img);
 
 #endif /*FILTERS_HH*/

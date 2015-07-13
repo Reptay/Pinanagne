@@ -1,7 +1,5 @@
 #include "filters.hh"
 
-//using namespace cv;
-//using namespace std;
 
 int main(int argc, char* argv[])
 {
@@ -11,7 +9,8 @@ int main(int argc, char* argv[])
   img = imread(argv[1], CV_LOAD_IMAGE_COLOR);
   if (img.data)
   {
-   BlueRedFilter(img);  
+   BlueRedFilter(img);
+   getContour(img);
    namedWindow("Display", WINDOW_AUTOSIZE);
    imshow("Display", img);
    waitKey(0);
