@@ -1,4 +1,4 @@
-CXX=clang++
+CXX=g++
 CXXFLAGS=-Wall -Wextra -Werror -pedantic -std=c++11 -g3
 FILES=src/main.cc src/filters.cc
 OBJ=$(FILES:.cc=.o)

@@ -16,4 +16,5 @@ void BlueFilter(Mat img);
 void BlueRedFilter(Mat img);
 void getContour(Mat& img);
 void getOrientation(Mat& img);
+void findcenter(Mat& img, Mat ori);
 #endif /*FILTERS_HH*/
