@@ -104,11 +104,10 @@ void getOrientation(Mat& img)
 
 
 
-Point findcenter(Mat img)
+Point findcenter(Mat img, vector<vector<Point> >* ret)
 {
-	vector<vector<Point> > ret;
-	findContours(img, ret, CV_RETR_LIST, CV_CHAIN_APPROX_NONE, Point());
-	OutputArray cnt = ret[0];
+	findContours(img, *ret, CV_RETR_LIST, CV_CHAIN_APPROX_NONE, Point());
+	vector<Point> cnt = (*ret)[0];
 	Moments m = moments(cnt, true);
 	int cx = m.m10/m.m00;
 	int cy = m.m01/m.m00;

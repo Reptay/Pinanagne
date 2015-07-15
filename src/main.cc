@@ -11,7 +11,8 @@ int main(int argc, char* argv[])
   {
    BlueRedFilter(img);
    getContour(img);
-   Point center = findcenter(img);
+   vector<vector<Point> > ret;
+   Point center = findcenter(img, &ret);
    /*Mat cpy(img);
    getContour(img);
    getOrientation(cpy);
