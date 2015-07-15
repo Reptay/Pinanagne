@@ -1,5 +1,5 @@
-#include "filters.hh"
-
+#include "filter/filters.hh"
+#include "detection/shape.hh"
 
 int main(int argc, char* argv[])
 {
@@ -9,6 +9,8 @@ int main(int argc, char* argv[])
   img = imread(argv[1], CV_LOAD_IMAGE_COLOR);
   if (img.data)
   {
+   getCircle(img);
+   
    BlueRedFilter(img);
    getContour(img);
    vector<vector<Point> > ret;
@@ -26,6 +28,7 @@ int main(int argc, char* argv[])
    findcenter(end,cpy);
    imshow("Display", end);
    waitKey(0);*/
+
    cout << "x=" << center.x << "y=" << center.y << endl;
    return 0;
   }
