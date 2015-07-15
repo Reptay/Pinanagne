@@ -11,4 +11,4 @@ check: all
 	./pinanagne tests/img/panneau-70.jpg
 
 clean:
-	$(RM) $(OBJ) $(OBJ2) $@
+	$(RM) $(OBJ) $(OBJ2) $(TARGET)

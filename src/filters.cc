@@ -87,7 +87,8 @@ void To_TSV(Mat img)
 
 void getContour(Mat& img)
 {
-	Canny(img,img,50,1500,3);
+  cvtColor(img, img, CV_BGR2GRAY);
+  Canny(img,img,50,1500,3);
 }
 
 void getOrientation(Mat& img)
