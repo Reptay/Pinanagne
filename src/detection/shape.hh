@@ -6,6 +6,7 @@
 #include <iostream>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <stdlib.h>
+#include <unistd.h>
 using namespace cv;
 using namespace std;
 
