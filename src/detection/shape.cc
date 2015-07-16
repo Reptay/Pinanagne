@@ -6,7 +6,7 @@ void getCircle(Mat img){
   cvtColor(img, img_gray, CV_BGR2GRAY);
 
   /// Reduce the noise so we avoid false circle detection
-  GaussianBlur(img_gray, img_gray, Size(9, 9), 2, 2 );
+  GaussianBlur(img_gray, img_gray, Size(3, 3), 2, 2 );
 
   vector<Vec3f> circles;
 
@@ -27,6 +27,4 @@ void getCircle(Mat img){
 
   namedWindow("Display", WINDOW_AUTOSIZE);
   imshow("Display", img);
-  waitKey(0);
-
 }
