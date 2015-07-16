@@ -12,7 +12,7 @@ vector<Point> get3Points(vector<Point> cnt, int seed)
 	return point3;	
 }
 
-vector<int> geteq(Point center, vector<Point> point3)
+vector<float> geteq(Point center, vector<Point> point3)
 {
 	int xc = center.x;
 	int yc = center.y;
@@ -22,14 +22,47 @@ vector<int> geteq(Point center, vector<Point> point3)
 	int y2 = point3[1].y - yc;
 	int x3 = point3[2].x - xc;
 	int y3 = point3[2].y - yc;
-	int divc = (y3^2) - ((y2^2)*(x1^2) - (y1^2))*x1*y1/(x2*y2*(x1^2) - (x2^2)*x1*y1) - (((y2^2) - (y1^2)/(x1^2))*x1*y1/(x2*y2*(x1^2) - (x2^2)*x1*y1) - (y1^2)/(x1^2))*(x3^2);
-	int numc = 1 - ((x1^2) - 1)*x3*y3/(x2*y2*(x1^2) - (x2^2)*x1*y1) - (1/(x1^2) - (1 - 1/(x1^2))*x1*y1/(x2*y2*(x1^2) - (x2^2)*x1*y1)) * (x3^2);
-	int c = numc / divc;
-	int b = ((x1^2) - 1)/(x2*y2*(x1^2) - (x2^2)*x1*y1) - c * ((y2^2) * (x1^2) - (y1^2))/(x2*y2*(x1^2) - (x2^2)*x1*y1);
-	int a = (1 - b * x1*y1 - c * (y1^2))/(x1^2);
-	vector<int> eq = vector<int>();
+	float divc = (y3^2) - ((y2^2)*(x1^2) - (y1^2))*x1*y1/(2*(x2*y2*(x1^2) - (x2^2)*x1*y1)) - (((y2^2) - (y1^2)/(x1^2))*x1*y1/(x2*y2*(x1^2) - (x2^2)*x1*y1) - (y1^2)/(x1^2))*(x3^2);
+	float numc = 1 - ((x1^2) - 1)*x3*y3/(2*(x2*y2*(x1^2) - (x2^2)*x1*y1)) - (1/(x1^2) - (1 - 1/(x1^2))*x1*y1/(x2*y2*(x1^2) - (x2^2)*x1*y1)) * (x3^2);
+	float c = numc / divc;
+	float b = (((x1^2) - 1)/(x2*y2*(x1^2) - (x2^2)*x1*y1) - c * ((y2^2) * (x1^2) - (y1^2))/(x2*y2*(x1^2) - (x2^2)*x1*y1))/2;
+	float a = (1 - 2 * b * x1*y1 - c * (y1^2))/(x1^2);
+	vector<float> eq = vector<float>();
 	eq.push_back(a);
 	eq.push_back(b);
 	eq.push_back(c);
 	return eq;
+}
+
+vector<float> checkEllipse(Mat img)
+{
+	namedWindow("Display1", WINDOW_AUTOSIZE);
+	namedWindow("Display2", WINDOW_AUTOSIZE);
+	namedWindow("DST", WINDOW_AUTOSIZE);
+	vector<float> ratios = vector<float>();
+	vector<vector<Point> > ret;
+	findContours(img, ret, CV_RETR_LIST, CV_CHAIN_APPROX_NONE, Point());
+	for (uint i = 0; i < ret.size(); i++)
+	{
+		vector<Point> cnt = ret[i];
+		RotatedRect rect = fitEllipse(cnt);
+		cout << rect.size.width << endl;
+		Mat img1 = Mat::zeros(img.rows, img.cols, CV_8UC3);
+		Mat img2 = Mat::zeros(img.rows, img.cols, CV_8UC3);
+		Mat dst = Mat::zeros(img.rows, img.cols, CV_8UC3);
+		drawContours(img1, ret, i, Scalar(255,255,255), 1, 8, noArray(), INT_MAX, Point());
+		ellipse(img2, rect, Scalar(255,255,255), 1, 8);
+		absdiff(img1,img2, dst);
+		imshow("Display1", img1);
+		waitKey(0);
+		imshow("Display2", img2);
+		waitKey(0);
+		imshow("DST", dst);
+		waitKey(0);
+		cvtColor(dst, dst, CV_RGB2GRAY);
+		int n = countNonZero(dst);
+		float ratio = (float)n / (float)cnt.size();
+		ratios.push_back(ratio);
+	}
+	return ratios;
 }

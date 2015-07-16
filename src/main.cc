@@ -1,6 +1,8 @@
 #include "filter/filters.hh"
 #include "detection/shape.hh"
 
+#include "ransac/ransac.hh"
+
 int main(int argc, char* argv[])
 {
  if (argc == 2)
@@ -9,17 +11,19 @@ int main(int argc, char* argv[])
   img = imread(argv[1], CV_LOAD_IMAGE_COLOR);
   if (img.data)
   {
-   getCircle(img);
+   //getCircle(img);
    
    BlueRedFilter(img);
    getContour(img);
-   vector<vector<Point> > ret;
-   Point center = findcenter(img, &ret);
+   //vector<vector<Point> > ret;
+   //Point center = findcenter(img, &ret);
    /*Mat cpy(img);
    getContour(img);
    getOrientation(cpy);
    Mat end(cpy);*/
-   
+   //vector<float> eq = geteq(center, ret[0]);
+   //cout << "A=" << eq[0] << "B=" << eq[1] << "C=" << eq[2] << endl;
+   vector<float> ellipses = checkEllipse(img);
    namedWindow("Display", WINDOW_AUTOSIZE);
    imshow("Display", img);
    waitKey(0);
@@ -28,8 +32,11 @@ int main(int argc, char* argv[])
    findcenter(end,cpy);
    imshow("Display", end);
    waitKey(0);*/
-
-   cout << "x=" << center.x << "y=" << center.y << endl;
+   for (uint i = 0; i < ellipses.size(); i++)
+	{
+		cout << ellipses[i] << endl;
+	}
+ //  cout << "x=" << center.x << "y=" << center.y << endl;
    return 0;
   }
  return 1;
