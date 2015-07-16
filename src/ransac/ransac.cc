@@ -34,23 +34,22 @@ vector<float> geteq(Point center, vector<Point> point3)
 	return eq;
 }
 
-vector<float> checkEllipse(Mat img)
+vector<float> checkEllipse(Mat img, vector<vector<Point> >* ret)
 {
 	namedWindow("Display1", WINDOW_AUTOSIZE);
 	namedWindow("Display2", WINDOW_AUTOSIZE);
 	namedWindow("DST", WINDOW_AUTOSIZE);
 	vector<float> ratios = vector<float>();
-	vector<vector<Point> > ret;
-	findContours(img, ret, CV_RETR_LIST, CV_CHAIN_APPROX_NONE, Point());
-	for (uint i = 0; i < ret.size(); i++)
+	//vector<vector<Point> > ret;
+	//findContours(img, ret, CV_RETR_LIST, CV_CHAIN_APPROX_NONE, Point());
+	for (uint i = 0; i < (*ret).size(); i++)
 	{
-		vector<Point> cnt = ret[i];
+		vector<Point> cnt = (*ret)[i];
 		RotatedRect rect = fitEllipse(cnt);
-		cout << rect.size.width << endl;
 		Mat img1 = Mat::zeros(img.rows, img.cols, CV_8UC3);
 		Mat img2 = Mat::zeros(img.rows, img.cols, CV_8UC3);
 		Mat dst = Mat::zeros(img.rows, img.cols, CV_8UC3);
-		drawContours(img1, ret, i, Scalar(255,255,255), 1, 8, noArray(), INT_MAX, Point());
+		drawContours(img1, *ret, i, Scalar(255,255,255), 1, 8, noArray(), INT_MAX, Point());
 		ellipse(img2, rect, Scalar(255,255,255), 1, 8);
 		absdiff(img1,img2, dst);
 		imshow("Display1", img1);
@@ -65,4 +64,46 @@ vector<float> checkEllipse(Mat img)
 		ratios.push_back(ratio);
 	}
 	return ratios;
+}
+
+vector<float> checkSquare(Mat img, vector<vector<Point> >* ret)
+{
+	vector<float> ratios = vector<float>();
+	for (uint i = 0; i < ret->size(); i++)
+	{
+		vector<Point> cnt = (*ret)[i];
+		RotatedRect rect = minAreaRect(cnt);
+		Mat img1 = Mat::zeros(img.rows, img.cols, CV_8UC3);
+		Mat img2 = Mat::zeros(img.rows, img.cols, CV_8UC3);
+		Mat dst = Mat::zeros(img.rows, img.cols, CV_8UC3);
+		drawContours(img1, *ret, i, Scalar(255,255,255), 1, 8, noArray(), INT_MAX, Point());
+		rectangle(img2, rect, Scalar(255,255,255), 1, 8);
+		absdiff(img1, img2, dst);
+		cvtColor(dst, dst, CV_RGB2GRAY);
+		int n = countNonZero(dst);
+		float ratio = (float)n / (float)cnt.size();
+		ratios.push_back(ratio);	
+	}
+	return ratios;
+}
+
+vector<int> checkTriangle(Mat img, vector<vector<Point> >* ret)
+{
+	vector<int> triangles = vector<int>();
+	for (uint i = 0; i < ret->size(); i++)
+	{
+		vector<Point> approx = vector<Point>(); 
+		vector<Point> cnt = (*ret)[i];
+		approxPolyDP(cnt, approx, arcLength(cnt, true) * 0.02, true);
+		if (!isContourConvex(approx))
+		{
+			triangles.push_back(0);
+			 continue;
+		}
+		if (approx.size() == 3)
+			triangles.push_back(1);
+		else
+			triangles.push_back(0);			
+	}
+	return triangles;
 }
