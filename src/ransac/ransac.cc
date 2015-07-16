@@ -45,6 +45,8 @@ vector<float> checkEllipse(Mat img, vector<vector<Point> >* ret)
 	for (uint i = 0; i < (*ret).size(); i++)
 	{
 		vector<Point> cnt = (*ret)[i];
+		if (cnt.size() < 5)
+			continue;
 		RotatedRect rect = fitEllipse(cnt);
 		Mat img1 = Mat::zeros(img.rows, img.cols, CV_8UC3);
 		Mat img2 = Mat::zeros(img.rows, img.cols, CV_8UC3);
@@ -52,12 +54,12 @@ vector<float> checkEllipse(Mat img, vector<vector<Point> >* ret)
 		drawContours(img1, *ret, i, Scalar(255,255,255), 1, 8, noArray(), INT_MAX, Point());
 		ellipse(img2, rect, Scalar(255,255,255), 1, 8);
 		absdiff(img1,img2, dst);
-		imshow("Display1", img1);
+		/*imshow("Display1", img1);
 		waitKey(0);
 		imshow("Display2", img2);
 		waitKey(0);
 		imshow("DST", dst);
-		waitKey(0);
+		waitKey(0);*/
 		cvtColor(dst, dst, CV_RGB2GRAY);
 		int n = countNonZero(dst);
 		float ratio = (float)n / (float)cnt.size();
@@ -77,7 +79,7 @@ vector<float> checkSquare(Mat img, vector<vector<Point> >* ret)
 		Mat img2 = Mat::zeros(img.rows, img.cols, CV_8UC3);
 		Mat dst = Mat::zeros(img.rows, img.cols, CV_8UC3);
 		drawContours(img1, *ret, i, Scalar(255,255,255), 1, 8, noArray(), INT_MAX, Point());
-		rectangle(img2, rect, Scalar(255,255,255), 1, 8);
+		rectangle(img2, Point(rect.center.x - rect.size.width/2, rect.center.y - rect.size.height/2), Point(rect.center.x + rect.size.width/2, rect.center.y + rect.size.height/2), Scalar(255,255,255), 1, 8);
 		absdiff(img1, img2, dst);
 		cvtColor(dst, dst, CV_RGB2GRAY);
 		int n = countNonZero(dst);
@@ -87,7 +89,7 @@ vector<float> checkSquare(Mat img, vector<vector<Point> >* ret)
 	return ratios;
 }
 
-vector<int> checkTriangle(Mat img, vector<vector<Point> >* ret)
+vector<int> checkTriangle(vector<vector<Point> >* ret)
 {
 	vector<int> triangles = vector<int>();
 	for (uint i = 0; i < ret->size(); i++)
@@ -106,4 +108,24 @@ vector<int> checkTriangle(Mat img, vector<vector<Point> >* ret)
 			triangles.push_back(0);			
 	}
 	return triangles;
+}
+
+
+//Tell if the form is a square(1), a triangle(2) or a circle(3), (0) is for nothing
+int giveForm(int tri, float rcir, float rrec)
+{
+	if (tri)
+		return 2;
+	else
+	{
+		if (rcir < 0.60)
+			return 3;
+		else
+		{
+			if (rrec < 0.60)
+				return 1;
+			else
+				return 0;
+		}
+	}
 }

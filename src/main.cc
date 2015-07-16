@@ -44,21 +44,24 @@ void traitementImage(char* path)
   img = imread(path, CV_LOAD_IMAGE_COLOR);
   if (img.data)
     {
-      getCircle(img);
-      waitKey(0);
+ //     getCircle(img);
+   //   waitKey(0);
       BlueRedFilter(img);
       getContour(img);
-      vector<vector<Point> > ret;
-      Point center = findcenter(img, &ret);
-	  vector<float> ellipses = checkEllipse(img, &ret);
       namedWindow("Display", WINDOW_AUTOSIZE);
       imshow("Display", img);
       waitKey(0);
+      vector<vector<Point> > ret;
+      Point center = findcenter(img, &ret);
+	  vector<float> ellipses = checkEllipse(img, &ret);
+	  vector<float> squares = checkSquare(img, &ret);
+	  vector<int> triangles = checkTriangle(&ret);
+
 	for (uint i = 0; i < ellipses.size(); i++)
 	{
-		cout << ellipses[i] << endl;
+		int val = giveForm(triangles[i], ellipses[i],squares[i]);
+		cout << val << endl;
 	}
-
       cout << "x=" << center.x << "y=" << center.y << endl;
     }
   else
@@ -67,8 +70,8 @@ void traitementImage(char* path)
 
 int main(int argc, char* argv[])
 {
-  std::string video = "tests/video/nationale/1/panneau1.mp4";
-  fluxWebcam(video);
+  //std::string video = "tests/video/nationale/1/panneau1.mp4";
+  //fluxWebcam(video);
 
  if (argc == 2)
  {
