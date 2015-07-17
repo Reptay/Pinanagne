@@ -47,7 +47,7 @@ vector<float> checkEllipse(Mat img, vector<vector<Point> >* ret)
 		vector<Point> cnt = (*ret)[i];
 		if (cnt.size() < 5)
 			continue;
-		RotatedRect rect = fitEllipse(cnt);
+		RotatedRect rect = minAreaRect(cnt);
 		Mat img1 = Mat::zeros(img.rows, img.cols, CV_8UC3);
 		Mat img2 = Mat::zeros(img.rows, img.cols, CV_8UC3);
 		Mat dst = Mat::zeros(img.rows, img.cols, CV_8UC3);
@@ -75,7 +75,7 @@ vector<int> checkSquare(vector<vector<Point> >* ret)
 	{
 		vector<Point> approx = vector<Point>();
 		vector<Point> cnt = (*ret)[i];
-		approxPolyDP(cnt, appox, arcLength(cnt, true) * 0.02, true);
+		approxPolyDP(cnt, approx, arcLength(cnt, true) * 0.02, true);
 		if (!isContourConvex(approx))
 		{
 			ratios.push_back(0);
@@ -122,7 +122,7 @@ int giveForm(int tri, float rcir, int rrec)
 			return 3;
 		else
 		{
-			if (rrec < 0.60)
+			if (rrec)
 				return 1;
 			else
 				return 0;

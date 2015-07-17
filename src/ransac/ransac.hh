@@ -6,7 +6,7 @@
 vector<Point> get3Points(OutputArray cnt, int seed);
 vector<float> geteq(Point center, vector<Point> point3);
 vector<float> checkEllipse(Mat img, vector<vector<Point> >* ret);
-vector<float> checkSquare(Mat img, vector<vector<Point> >* ret);
+vector<int> checkSquare(vector<vector<Point> >* ret);
 vector<int> checkTriangle(vector<vector<Point> >* ret);
-int giveForm(int triangle, float rcirc, float rrect);
+int giveForm(int triangle, float rcirc, int rrect);
 #endif /*RANSAC_HH*/

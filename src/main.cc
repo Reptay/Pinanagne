@@ -63,7 +63,7 @@ void traitementImage(char* path)
 
 	for (uint i = 0; i < ellipses.size(); i++)
 	{
-		int val = giveForm(triangles[i], ellipses[i],squares[i]);
+		int val = giveForm(triangles[i], ellipses[i], squares[i]);
 		cout << val << endl;
 	}
       cout << "x=" << center.x << "y=" << center.y << endl;
@@ -74,8 +74,8 @@ void traitementImage(char* path)
 
 int main(int argc, char* argv[])
 {
-  std::string video = "tests/video/nationale/1/panneau1.mp4";
-  fluxWebcam(video);
+ // std::string video = "tests/video/nationale/1/panneau1.mp4";
+  //fluxWebcam(video);
 
  if (argc == 2)
  {
