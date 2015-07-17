@@ -13,6 +13,8 @@ class Circle
 {
 public:
   Circle(Point center, float radius);
+  Point getCenter();
+  float getRadius();
 private:
   Point center_;
   float radius_;
