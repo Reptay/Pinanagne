@@ -50,12 +50,13 @@ void traitementImage(char* path)
  //     getCircle(img);
    //   waitKey(0);
       BlueRedFilter(img);
-      getContour(img);
-	  blur(img, img, Size(5,5));
+      //getContour(img);
+	//  blur(img, img, Size(20,20));
       namedWindow("Display", WINDOW_AUTOSIZE);
       imshow("Display", img);
       waitKey(0);
       vector<vector<Point> > ret;
+	  cvtColor(img, img, CV_BGR2GRAY);
       Point center = findcenter(img, &ret);
 	  vector<float> ellipses = checkEllipse(img, &ret);
 	  vector<int> squares = checkSquare(&ret);

@@ -47,22 +47,22 @@ vector<float> checkEllipse(Mat img, vector<vector<Point> >* ret)
 		vector<Point> cnt = (*ret)[i];
 		if (cnt.size() < 5)
 			continue;
-		RotatedRect rect = minAreaRect(cnt);
+		RotatedRect rect = fitEllipse(cnt);
 		Mat img1 = Mat::zeros(img.rows, img.cols, CV_8UC3);
 		Mat img2 = Mat::zeros(img.rows, img.cols, CV_8UC3);
 		Mat dst = Mat::zeros(img.rows, img.cols, CV_8UC3);
 		drawContours(img1, *ret, i, Scalar(255,255,255), 1, 8, noArray(), INT_MAX, Point());
 		ellipse(img2, rect, Scalar(255,255,255), 1, 8);
 		absdiff(img1,img2, dst);
-		/*imshow("Display1", img1);
+		imshow("Display1", img1);
 		waitKey(0);
 		imshow("Display2", img2);
 		waitKey(0);
 		imshow("DST", dst);
-		waitKey(0);*/
+		waitKey(0);
 		cvtColor(dst, dst, CV_RGB2GRAY);
 		int n = countNonZero(dst);
-		float ratio = (float)n / (float)cnt.size();
+		float ratio = (float)n / (float)(cnt.size() * 2);
 		ratios.push_back(ratio);
 	}
 	return ratios;
@@ -75,7 +75,7 @@ vector<int> checkSquare(vector<vector<Point> >* ret)
 	{
 		vector<Point> approx = vector<Point>();
 		vector<Point> cnt = (*ret)[i];
-		approxPolyDP(cnt, approx, arcLength(cnt, true) * 0.02, true);
+		approxPolyDP(cnt, approx, arcLength(cnt, true) * 0.002, true);
 		if (!isContourConvex(approx))
 		{
 			ratios.push_back(0);
@@ -118,7 +118,7 @@ int giveForm(int tri, float rcir, int rrec)
 		return 2;
 	else
 	{
-		if (rcir < 0.60)
+		if (rcir < 0.30)
 			return 3;
 		else
 		{
