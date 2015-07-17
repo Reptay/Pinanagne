@@ -51,13 +51,14 @@ void traitementImage(char* path)
    //   waitKey(0);
       BlueRedFilter(img);
       getContour(img);
+	  blur(img, img, Size(5,5));
       namedWindow("Display", WINDOW_AUTOSIZE);
       imshow("Display", img);
       waitKey(0);
       vector<vector<Point> > ret;
       Point center = findcenter(img, &ret);
 	  vector<float> ellipses = checkEllipse(img, &ret);
-	  vector<float> squares = checkSquare(img, &ret);
+	  vector<int> squares = checkSquare(&ret);
 	  vector<int> triangles = checkTriangle(&ret);
 
 	for (uint i = 0; i < ellipses.size(); i++)

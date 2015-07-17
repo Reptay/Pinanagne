@@ -68,23 +68,23 @@ vector<float> checkEllipse(Mat img, vector<vector<Point> >* ret)
 	return ratios;
 }
 
-vector<float> checkSquare(Mat img, vector<vector<Point> >* ret)
+vector<int> checkSquare(vector<vector<Point> >* ret)
 {
-	vector<float> ratios = vector<float>();
+	vector<int> ratios = vector<int>();
 	for (uint i = 0; i < ret->size(); i++)
 	{
+		vector<Point> approx = vector<Point>();
 		vector<Point> cnt = (*ret)[i];
-		RotatedRect rect = minAreaRect(cnt);
-		Mat img1 = Mat::zeros(img.rows, img.cols, CV_8UC3);
-		Mat img2 = Mat::zeros(img.rows, img.cols, CV_8UC3);
-		Mat dst = Mat::zeros(img.rows, img.cols, CV_8UC3);
-		drawContours(img1, *ret, i, Scalar(255,255,255), 1, 8, noArray(), INT_MAX, Point());
-		rectangle(img2, Point(rect.center.x - rect.size.width/2, rect.center.y - rect.size.height/2), Point(rect.center.x + rect.size.width/2, rect.center.y + rect.size.height/2), Scalar(255,255,255), 1, 8);
-		absdiff(img1, img2, dst);
-		cvtColor(dst, dst, CV_RGB2GRAY);
-		int n = countNonZero(dst);
-		float ratio = (float)n / (float)cnt.size();
-		ratios.push_back(ratio);	
+		approxPolyDP(cnt, appox, arcLength(cnt, true) * 0.02, true);
+		if (!isContourConvex(approx))
+		{
+			ratios.push_back(0);
+			continue;
+		}
+		if (approx.size() == 4)
+			ratios.push_back(1);
+		else
+			ratios.push_back(0);	
 	}
 	return ratios;
 }
@@ -112,7 +112,7 @@ vector<int> checkTriangle(vector<vector<Point> >* ret)
 
 
 //Tell if the form is a square(1), a triangle(2) or a circle(3), (0) is for nothing
-int giveForm(int tri, float rcir, float rrec)
+int giveForm(int tri, float rcir, int rrec)
 {
 	if (tri)
 		return 2;
