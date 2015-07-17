@@ -25,10 +25,13 @@ void fluxWebcam(std::string path)
     image = cvQueryFrame(capture);
 
     Mat img = Mat(image);
-    getCircle(img);
+    Circle *c = getCircle(img);
+    c++; //a supprimer
+    /* Si c != NULL alors RANSAC */
+
     //cvShowImage( "Webcam", image);
     // On attend 10ms
-    key = cvWaitKey(10);
+    key = cvWaitKey(1);
  
   }
  
@@ -70,8 +73,8 @@ void traitementImage(char* path)
 
 int main(int argc, char* argv[])
 {
-  //std::string video = "tests/video/nationale/1/panneau1.mp4";
-  //fluxWebcam(video);
+  std::string video = "tests/video/nationale/1/panneau1.mp4";
+  fluxWebcam(video);
 
  if (argc == 2)
  {
@@ -85,7 +88,7 @@ int main(int argc, char* argv[])
    return 1;
  }
  return 2;
-}
+ }
 }
 
 

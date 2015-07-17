@@ -1,7 +1,7 @@
 #include "shape.hh"
 
-void getCircle(Mat img){
-
+Circle* getCircle(Mat img){
+  Circle *c = NULL;
   Mat img_gray;
   cvtColor(img, img_gray, CV_BGR2GRAY);
 
@@ -23,8 +23,10 @@ void getCircle(Mat img){
       circle( img, center, 3, Scalar(0,255,0), -1, 8, 0 );
       // circle outline
       circle( img, center, radius, Scalar(0,0,255), 2, 8, 0 );
+      c = new Circle(center, radius);
     }
 
   namedWindow("Display", WINDOW_AUTOSIZE);
   imshow("Display", img);
+  return c;
 }
