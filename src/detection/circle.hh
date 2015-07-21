@@ -13,6 +13,7 @@ class Circle
 {
 public:
   Circle(Point center, float radius);
+  void draw(Mat img);
   Point getCenter();
   float getRadius();
 private:

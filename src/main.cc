@@ -47,14 +47,17 @@ void traitementImage(char* path)
   img = imread(path, CV_LOAD_IMAGE_COLOR);
   if (img.data)
     {
- //     getCircle(img);
-   //   waitKey(0);
-      BlueRedFilter(img);
-      //getContour(img);
-	//  blur(img, img, Size(20,20));
+      /******* Detection d'un panneau de limitation *******/
+      Circle* c = getCircle(img); // Le panneau detecte, NULL si aucun detecte
+      //c->draw(img);
+      /*BlueRedFilter(img);
+      getContour(img);
+      blur(img, img, Size(20,20));
       namedWindow("Display", WINDOW_AUTOSIZE);
       imshow("Display", img);
-      waitKey(0);
+      waitKey(0);*/
+      /***************************************************/
+      /******* Lecture du panneau *******/
       vector<vector<Point> > ret;
 	  cvtColor(img, img, CV_BGR2GRAY);
       Point center = findcenter(img, &ret);
@@ -68,6 +71,7 @@ void traitementImage(char* path)
 		cout << val << endl;
 	}
       cout << "x=" << center.x << "y=" << center.y << endl;
+      /***************************************************/
     }
   else
     exit(1);
@@ -92,6 +96,3 @@ int main(int argc, char* argv[])
  return 2;
  }
 }
-
-
- 

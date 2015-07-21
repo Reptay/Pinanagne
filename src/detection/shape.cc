@@ -15,6 +15,7 @@ Circle* getCircle(Mat img){
 	       img_gray.rows/8, 200, 100, 0, 0 );
 
   /// Draw the circles detected
+  
   for( size_t i = 0; i < circles.size(); i++ )
     {
       Point center(cvRound(circles[i][0]), cvRound(circles[i][1]));
