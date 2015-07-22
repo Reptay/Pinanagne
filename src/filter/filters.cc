@@ -5,8 +5,12 @@ void RedFilter(Mat img)
 	for (int i = 0; i < img.cols; i++)
 		for (int j = 0; j < img.rows; j++)
 		{
-			Point3_<uchar>* p = img.ptr<Point3_<uchar> >(i,j);
-			if (p->z > 200 && p->x < p->z && p->y < p->z)
+		  Point3_<uchar>* p = img.ptr<Point3_<uchar> >(j,i);
+
+			int r = p->z;
+			int g = p->y;
+			int b = p->x;
+			if (r > 2*(g+b) && r > 30)
 			{
 				p->z = 0;
 				p->x = 0;

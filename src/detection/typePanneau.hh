@@ -9,7 +9,7 @@
 #include <unistd.h>
 #include <vector>
 #include "circle.hh"
-
+#include "../filter/filters.hh"
 
 /**
  * Retourne l'image du panneau si c'est ok
