@@ -1,5 +1,5 @@
-#ifndef SHAPE_HH
-#define SHAPE_HH
+#ifndef TYPEPANNEAU_HH
+#define TYPEPANNEAU_HH
 
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
@@ -9,12 +9,12 @@
 #include <unistd.h>
 #include <vector>
 #include "circle.hh"
-using namespace cv;
-using namespace std;
+
 
 /**
- * Detecte tous les ronds dans l'images
+ * Retourne l'image du panneau si c'est ok
+ * Retourne NULL sinon
  */
-std::vector<Circle*> getCircles(Mat img);
+Mat* isLimitation(Mat img, Circle* c);
 
 #endif

@@ -1,7 +1,7 @@
 #include <string>
 #include "filter/filters.hh"
 #include "detection/shape.hh"
-
+#include "detection/typePanneau.hh"
 #include "ransac/ransac.hh"
 
 void fluxWebcam(std::string path)
@@ -25,8 +25,7 @@ void fluxWebcam(std::string path)
     image = cvQueryFrame(capture);
 
     Mat img = Mat(image);
-    Circle *c = getCircle(img);
-    c++; //a supprimer
+    //    std::vector<Circle*> circles = getCircle(img);
     /* Si c != NULL alors RANSAC */
 
     //cvShowImage( "Webcam", image);
@@ -48,7 +47,20 @@ void traitementImage(char* path)
   if (img.data)
     {
       /******* Detection d'un panneau de limitation *******/
-      Circle* c = getCircle(img); // Le panneau detecte, NULL si aucun detecte
+      std::vector<Circle*> circles = getCircles(img);
+      std::vector<Mat> panneaux;
+      for (std::vector<Circle*>::iterator it = circles.begin();
+	   it != circles.end(); it++){
+	Mat* m = isLimitation(img, *it);
+	if (m != NULL)
+	  panneaux.push_back(*m);
+      }
+      for (std::vector<Mat>::iterator it = panneaux.begin();
+           it != panneaux.end(); it++){
+	namedWindow("Display", WINDOW_AUTOSIZE);
+	imshow("Display", *it);
+	waitKey(0);
+      }
       //c->draw(img);
       /*BlueRedFilter(img);
       getContour(img);
@@ -58,6 +70,7 @@ void traitementImage(char* path)
       waitKey(0);*/
       /***************************************************/
       /******* Lecture du panneau *******/
+      /*
       vector<vector<Point> > ret;
 	  cvtColor(img, img, CV_BGR2GRAY);
       Point center = findcenter(img, &ret);
@@ -71,6 +84,7 @@ void traitementImage(char* path)
 		cout << val << endl;
 	}
       cout << "x=" << center.x << "y=" << center.y << endl;
+      */
       /***************************************************/
     }
   else

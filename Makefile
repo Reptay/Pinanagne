@@ -1,6 +1,6 @@
 CXX=g++
 CXXFLAGS=-Wall -Wextra -Werror -pedantic -std=c++11 -g3
-FILES=src/main.cc src/filter/filters.cc src/detection/shape.cc src/detection/circle.cc src/ransac/ransac.cc 
+FILES=src/main.cc src/filter/filters.cc src/detection/shape.cc src/detection/circle.cc src/ransac/ransac.cc src/detection/typePanneau.cc
 OBJ=$(FILES:.cc=.o)
 TARGET=pinanagne
 
