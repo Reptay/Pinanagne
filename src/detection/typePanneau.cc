@@ -41,19 +41,28 @@ Mat* isLimitation(Mat img, Circle* c)
 }
 
 
+/**
+ * Retourne la moitié de la hauteur total du panneau + le rayonFlou
+ */
 int getHauteur(Mat imgRed, int rayonFlou, int cx, int cy){
   int hauteur = 0;
   int findRed = 0;
+  int bandeHaut = 0; //largeur de la partie rouge
+  int bandeBas = 0;
 
   for(int i = cy; i < imgRed.rows; i++) // vers le bas
     {
       Point3_<uchar>* p = imgRed.ptr<Point3_<uchar> >(i,cx);
       int r = p->z; // 0 = rouge, 255 = autre
-      if (r == 0)
+      if (r == 0){ // on est sur du rouge
         findRed = 1;
-      else if (r != 0 && findRed <= rayonFlou && findRed != 0)
-        findRed++;
-      else if (findRed != 0){
+	bandeBas++;
+      }
+      else if (r != 0 && findRed <= rayonFlou && findRed != 0 &&
+	       i < imgRed.rows-1){
+        findRed++; // on est pas sur du rouge mais on en a deja vu (rayonFlou)
+      }
+      else if (findRed != 0){ //on est pas sur du rouge et on en a vu y'a trop longtemps
         hauteur = i - cy;
         break;
       }
@@ -65,31 +74,52 @@ int getHauteur(Mat imgRed, int rayonFlou, int cx, int cy){
     {
       Point3_<uchar>* p = imgRed.ptr<Point3_<uchar> >(i,cx);
       int r = p->z; // 0 = rouge, 255 = autre
-      if (r == 0)
+      if (r == 0){
         findRed = 1;
-      else if (r != 0 && findRed <= rayonFlou && findRed != 0)
+	bandeHaut++;
+      }
+      else if (r != 0 && findRed <= rayonFlou && findRed != 0){
         findRed++;
+      }
       else if (findRed != 0){
 	if (cy - i > hauteur)
 	  hauteur = cy - i;
         break;
       }
-
     }
-
+  if (bandeBas*2 < bandeHaut || bandeHaut*2 < bandeBas){
+    std::cout << "Bande haut et bande bas disproportionné, typePanneau.cc"
+	      <<std::endl;
+    return 0;
+  }
+  if (hauteur / bandeBas < 3 || hauteur / bandeBas > 7 ||
+      hauteur / bandeHaut < 3 || hauteur / bandeHaut > 7){
+    std::cout <<
+      "Hauteur disproportionné par rapport au contour, typePanneau.cc"<<
+      std::endl;
+    return 0;
+  }
+  // 3 < < 7
   return hauteur;
 }
 
+/**
+ * Fait la meme chose que getHauteur mais pour la largeur
+ */
 int getLargeur(Mat imgRed, int rayonFlou, int cx, int cy){
   int largeur = 0;
   int findRed = 0;
-  
+  int bandeDroite = 0;
+  int bandeGauche = 0;
+
   for (int i = cx; i < imgRed.cols; i++) // vers la droite
     {
       Point3_<uchar>* p = imgRed.ptr<Point3_<uchar> >(cy,i);
       int r = p->z; // 0 = rouge, 255 = autre
-      if (r == 0)
+      if (r == 0){
         findRed = 1;
+	bandeDroite++;
+      }
       else if (r != 0 && findRed <= rayonFlou && findRed != 0)
         findRed++;
       else if (findRed != 0){
@@ -104,8 +134,10 @@ int getLargeur(Mat imgRed, int rayonFlou, int cx, int cy){
     {
       Point3_<uchar>* p = imgRed.ptr<Point3_<uchar> >(cy,i);
       int r = p->z; // 0 = rouge, 255 = autre
-      if (r == 0)
+      if (r == 0){
         findRed = 1;
+	bandeGauche++;
+      }
       else if (r != 0 && findRed <= rayonFlou && findRed != 0)
         findRed++;
       else if (findRed != 0){
@@ -114,6 +146,19 @@ int getLargeur(Mat imgRed, int rayonFlou, int cx, int cy){
 	break;
       }
     }
+
+  if (bandeDroite*2 < bandeGauche || bandeGauche*2 < bandeDroite){
+    std::cout << "Bande gauche et bande droite disproportionné, typePanneau.cc"
+              <<std::endl;
+    return 0;
+  }
+  if (largeur / bandeDroite < 3 || largeur / bandeDroite > 7 ||
+      largeur / bandeGauche < 3 || largeur / bandeGauche > 7){
+    std::cout <<
+      "largeur disproportionné par rapport au contour, typePanneau.cc"<<
+      std::endl;
+    return 0;
+  }
 
   return largeur;
 }

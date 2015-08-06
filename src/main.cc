@@ -44,6 +44,7 @@ void traitementImage(char* path)
 {
   Mat img;
   img = imread(path, CV_LOAD_IMAGE_COLOR);
+
   if (img.data)
     {
       /******* Detection d'un panneau de limitation *******/
@@ -61,6 +62,7 @@ void traitementImage(char* path)
 	imshow("Display", *it);
 	waitKey(0);
       }
+      exit(0);
       //c->draw(img);
       /*BlueRedFilter(img);
       getContour(img);
@@ -92,10 +94,10 @@ void traitementImage(char* path)
 }
 
 int main(int argc, char* argv[])
-{
- // std::string video = "tests/video/nationale/1/panneau1.mp4";
-  //fluxWebcam(video);
-
+{/*
+  std::string video = "tests/video/nationale/1/panneau1.mp4";
+  fluxWebcam(video);
+ */
  if (argc == 2)
  {
   Mat img;
