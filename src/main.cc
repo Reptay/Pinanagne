@@ -24,11 +24,11 @@ void fluxWebcam(std::string path)
     // On récupère une image
     image = cvQueryFrame(capture);
 
-    Mat img = Mat(image);
+    Mat img = cvarrToMat(image);
     //    std::vector<Circle*> circles = getCircle(img);
     /* Si c != NULL alors RANSAC */
 
-    //cvShowImage( "Webcam", image);
+    cvShowImage( "Webcam", image);
     // On attend 10ms
     key = cvWaitKey(1);
  
