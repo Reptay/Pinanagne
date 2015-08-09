@@ -1,7 +1,13 @@
 #include "typePanneau.hh"
 
-int getHauteur(Mat imgRed, int rayonFlou, int cx, int cy);
-int getLargeur(Mat imgRed, int rayonFlou, int cx, int cy);
+int getHauteur(Mat imgRed, int rayonFlou, int cx, int cy, int &minBande);
+int getLargeur(Mat imgRed, int rayonFlou, int cx, int cy, int &minBande);
+int min(int a, int b){
+  if (a<b)
+    return a;
+  else
+    return b;
+}
 
 Mat* isLimitation(Mat img, Circle* c)
 {
@@ -15,8 +21,9 @@ Mat* isLimitation(Mat img, Circle* c)
   Mat imgRed = img.clone();
   RedFilter(imgRed);
   int rayonFlou = 1; // pour le calcul hauteur et largeur du cercle rouge
-  int hauteur =  getHauteur(imgRed, rayonFlou, cx, cy);
-  int largeur = getLargeur(imgRed, rayonFlou, cx, cy);
+  int minBande = 0;
+  int hauteur =  getHauteur(imgRed, rayonFlou, cx, cy, minBande);
+  int largeur = getLargeur(imgRed, rayonFlou, cx, cy, minBande);
   std::cout << "rayon " << r << std::endl;
   std::cout << "hauteur " << hauteur << std::endl;
   std::cout << "largeur " << largeur << std::endl;
@@ -27,15 +34,42 @@ Mat* isLimitation(Mat img, Circle* c)
     return NULL;
 
   /* créé l'image du panneau uniquement */
+  //cercle de l'image du panneau uniqueement
+  Circle* c2 = new Circle(Point(largeur, hauteur),
+			  min(hauteur, largeur));
+  minBande += rayonFlou;
+
   Mat* panneau = new Mat(2*hauteur, 2*largeur,CV_8UC3, Scalar(0,0,0));
   for (int i = cx-largeur; i < cx+largeur; i++)
     for (int j = cy-hauteur; j < cy+hauteur; j++){
+
      Point3_<uchar>* pImg = img.ptr<Point3_<uchar> >(j,i);
      Point3_<uchar>* pPan = panneau->ptr<Point3_<uchar>>(j-cy+hauteur,i-cx+largeur);
      pPan->x = pImg->x;
      pPan->y = pImg->y;
      pPan->z = pImg->z;
    }
+
+  /* Rend blanc l'exterieur du panneau, pour ne pas analyser le fond */
+  Mat imgBlack = panneau->clone();
+  for (int i = 0; i < imgBlack.cols; i++)
+    for (int j = 0; j < imgBlack.rows; j++)
+      {
+	Point3_<uchar>* pImg = imgBlack.ptr<Point3_<uchar> >(j,i);
+	int distCentre = sqrt(pow((j - c2->getCenter().x), 2) +
+			      pow((i - c2->getCenter().y), 2));
+	if (distCentre >= c2->getRadius() - minBande)
+	  {
+	    pImg->x = 255;
+	    pImg->y = 255;
+	    pImg->z = 255;
+	  }
+
+      }/*
+  namedWindow("Display", WINDOW_AUTOSIZE);                                  
+  imshow("Display", imgBlack);                                                   */
+  waitKey(0);
+   BlackFilter(imgBlack);
 
    return panneau;
 }
@@ -44,12 +78,11 @@ Mat* isLimitation(Mat img, Circle* c)
 /**
  * Retourne la moitié de la hauteur total du panneau + le rayonFlou
  */
-int getHauteur(Mat imgRed, int rayonFlou, int cx, int cy){
+int getHauteur(Mat imgRed, int rayonFlou, int cx, int cy, int &minBande){
   int hauteur = 0;
   int findRed = 0;
   int bandeHaut = 0; //largeur de la partie rouge
   int bandeBas = 0;
-
   for(int i = cy; i < imgRed.rows; i++) // vers le bas
     {
       Point3_<uchar>* p = imgRed.ptr<Point3_<uchar> >(i,cx);
@@ -99,14 +132,16 @@ int getHauteur(Mat imgRed, int rayonFlou, int cx, int cy){
       std::endl;
     return 0;
   }
-  // 3 < < 7
+  minBande = bandeHaut;
+  if (bandeBas < minBande)
+    minBande = bandeBas;
   return hauteur;
 }
 
 /**
  * Fait la meme chose que getHauteur mais pour la largeur
  */
-int getLargeur(Mat imgRed, int rayonFlou, int cx, int cy){
+int getLargeur(Mat imgRed, int rayonFlou, int cx, int cy, int &minBande){
   int largeur = 0;
   int findRed = 0;
   int bandeDroite = 0;
@@ -159,6 +194,27 @@ int getLargeur(Mat imgRed, int rayonFlou, int cx, int cy){
       std::endl;
     return 0;
   }
-
+  if (bandeGauche < minBande)
+    minBande = bandeGauche;
+  if (bandeDroite < minBande)
+    minBande = bandeDroite;
   return largeur;
 }
+
+
+/**
+ * Cherche les zones de la couleur=(r,g,b) EXACT
+ */
+/*
+int nbCouleurContinu(Mat *img, int hauteur, int largeur, int rayonFLou
+		     int r, int g, int b)
+{
+  int rayon;
+  if (hauteur>largeur)
+    rayon = hauteur - rayonFlou;
+  else
+    rayon = largeur - rayonFlou;
+  int minBande = rayon/7; // correspond a la largeur de la bande minimal
+  rayon = rayon-minBande; //rayon de recherche maximum (sans la bande rouge)
+}
+*/

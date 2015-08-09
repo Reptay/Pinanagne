@@ -84,6 +84,33 @@ void BlueRedFilter(Mat img)
 
 }
 
+void BlackFilter(Mat img)
+{
+  for (int i = 0; i < img.cols; i++)
+    for (int j = 0; j < img.rows; j++)
+      {
+	Point3_<uchar>* p = img.ptr<Point3_<uchar> >(j,i);
+
+	int r = p->z;
+	int g = p->y;
+	int b = p->x;
+	//	if (r > 2*(g+b) && r > 30)
+	if ((r+g+b < 50 && r+g>b && r+b>g && g+b>r) ||
+	    (r+g+b<30))
+	  {
+	    p->z = 0;
+	    p->x = 0;
+	    p->y = 0;
+	  }
+	else
+	  {
+	    p->z = 255;
+	    p->y = 255;
+	    p->x = 255;
+	  }
+      }
+}
+
 void To_TSV(Mat img)
 {
 	cvtColor(img, img, CV_BGR2HSV, 0);

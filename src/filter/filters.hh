@@ -14,6 +14,7 @@ using namespace std;
 void RedFilter(Mat img);
 void BlueFilter(Mat img);
 void BlueRedFilter(Mat img);
+void BlackFilter(Mat img);
 void getContour(Mat& img);
 void getOrientation(Mat& img);
 Point findcenter(Mat img, vector<vector<Point> >* ret);
