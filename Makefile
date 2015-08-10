@@ -1,4 +1,4 @@
-CXX=g++
+BBBBBCXX=g++
 CXXFLAGS=-Wall -Wextra -Werror -pedantic -std=c++11 -g3
 FILES=src/main.cc src/filter/filters.cc src/detection/shape.cc src/detection/circle.cc src/ransac/ransac.cc src/detection/typePanneau.cc
 OBJ=$(FILES:.cc=.o)
@@ -21,6 +21,16 @@ checkfp : all #faux positifs
 	./pinanagne tests/img/faux-positif/interdiction2.jpg
 	./pinanagne tests/img/faux-positif/pieton2.jpg
 	./pinanagne tests/img/faux-positif/stop2.jpg
+
+checkstd : all #panneaux vitesse standard
+	./pinanagne tests/img/panneau-vitesse-standard/panneau30.jpg
+	./pinanagne tests/img/panneau-vitesse-standard/panneau50.jpg
+	./pinanagne tests/img/panneau-vitesse-standard/panneau70.png
+	./pinanagne tests/img/panneau-vitesse-standard/panneau90.jpg
+	./pinanagne tests/img/panneau-vitesse-standard/panneau110.jpg   
+	./pinanagne tests/img/panneau-vitesse-standard/panneau130.png  
+
+
 
 clean:
 	$(RM) $(OBJ) $(OBJ2) $(TARGET)

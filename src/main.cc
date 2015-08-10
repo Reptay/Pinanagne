@@ -90,7 +90,10 @@ void traitementImage(char* path)
       /***************************************************/
     }
   else
-    exit(1);
+    {
+      std::cerr << "Ouverture de l'image impossible" << std::endl;
+      exit(1);
+    }
 }
 
 int main(int argc, char* argv[])
