@@ -42,7 +42,10 @@ Mat* isLimitation(Mat img, Circle* c)
   if (largeur == 0 || hauteur == 0 ||
       2*largeur < r || 2*hauteur < r ||
       2*r < largeur || 2*r < hauteur)
-    return NULL;
+    {
+      std::cerr<< "largeur ou hauteur non valide" << std::endl;
+      return NULL;
+    }
 
   /* créé l'image du panneau uniquement */
   //cercle de l'image du panneau uniqueement
@@ -277,6 +280,36 @@ int detecteZone(Mat *img, int i, int j, int r, int g, int b, int size,
   visite[j][i] = true;
   size++;
 
+
+  int rayonFlou = 2; // >= 1
+  for (int x = rayonFlou*-1; x <= rayonFlou; x++)
+    {
+      if(x==0)
+	continue;
+      if (j+x < img->rows && !visite[j+x][i]){
+	Point3_<uchar>* pImg2 = img->ptr<Point3_<uchar> >(j+x,i);
+	if (pImg2->x == b && pImg2->y == g && pImg2->z == r)
+	  size = detecteZone(img, i, j+x, r, g, b, size, visite);
+      }
+      if (j-x >= 0 && !visite[j-x][i]){
+	Point3_<uchar>* pImg2 = img->ptr<Point3_<uchar> >(j-x,i);
+	if (pImg2->x == b && pImg2->y == g && pImg2->z == r)
+	  size = detecteZone(img, i, j-x, r, g, b, size, visite);
+      }
+      if (i+x < img->cols && !visite[j][i+x]){
+	Point3_<uchar>* pImg2 = img->ptr<Point3_<uchar> >(j,i+x);
+	if (pImg2->x == b && pImg2->y == g && pImg2->z == r)
+	  size = detecteZone(img, i+x, j, r, g, b, size, visite);
+      }
+      if (i-x >= 0 && !visite[j][i-x]){
+	Point3_<uchar>* pImg2 = img->ptr<Point3_<uchar> >(j,i-x);
+	if (pImg2->x == b && pImg2->y == g && pImg2->z == r)
+	  size = detecteZone(img, i-x, j, r, g, b, size, visite);
+      }
+
+    }
+
+  /*
   if (j+1 < img->rows && !visite[j+1][i]){
     Point3_<uchar>* pImg2 = img->ptr<Point3_<uchar> >(j+1,i);
     if (pImg2->x == b && pImg2->y == g && pImg2->z == r)
@@ -297,5 +330,6 @@ int detecteZone(Mat *img, int i, int j, int r, int g, int b, int size,
     if (pImg2->x == b && pImg2->y == g && pImg2->z == r)
       size = detecteZone(img, i-1, j, r, g, b, size, visite);
   }
+  */
   return size;
 }

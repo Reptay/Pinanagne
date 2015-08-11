@@ -10,7 +10,9 @@ void RedFilter(Mat img)
 			int r = p->z;
 			int g = p->y;
 			int b = p->x;
-			if (r > 2*(g+b) && r > 30)
+			if ((r > 2*(g+b) && r > 30) ||
+			    (r>80 && r>g+b) ||
+			    (r>120 && r>(g+b)*0.8))
 			{
 				p->z = 0;
 				p->x = 0;
@@ -96,7 +98,9 @@ void BlackFilter(Mat img)
 	int b = p->x;
 	//	if (r > 2*(g+b) && r > 30)
 	if ((r+g+b < 50 && r+g>b && r+b>g && g+b>r) ||
-	    (r+g+b<30))
+	    (r+g+b<30) ||
+	    (r < 50 && b < 50 && g < 50) ||
+	    (r<100 && b < 100 && g < 100 && r+g>b && r+b>g && g+b>r))
 	  {
 	    p->z = 0;
 	    p->x = 0;

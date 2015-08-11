@@ -6,17 +6,17 @@ std::vector<Circle*> getCircles(Mat img){
   cvtColor(img, img_gray, CV_BGR2GRAY);
 
   /// Reduce the noise so we avoid false circle detection
-  GaussianBlur(img_gray, img_gray, Size(3, 3), 2, 2 );
+  GaussianBlur(img_gray, img_gray, Size(3,3), 2, 2);
 
   vector<Vec3f> circles;
 
   /// Apply the Hough Transform to find the circles
-  HoughCircles(img_gray, circles, CV_HOUGH_GRADIENT, 1,
-	       img_gray.rows/8, 200, 100, 0, 0 );
+  HoughCircles(img_gray, circles, CV_HOUGH_GRADIENT, 1.2,
+  	       img_gray.rows/8,200, 100, 0, 0 );
+
 
   /// Draw the circles detected
-  
-  
+
   for( size_t i = 0; i < circles.size(); i++ )
     {
       Point center(cvRound(circles[i][0]), cvRound(circles[i][1]));
