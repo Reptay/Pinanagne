@@ -37,7 +37,8 @@ void fluxWebcam(std::string path)
       Mat* m = isLimitation(img, *it);
       if (m != NULL){
 	panneaux.push_back(*m);
-	std::cerr << "OK" << std::endl;
+	std::cerr <<std::endl<<
+	  "----------------" <<"OK"<<"----------------" << std::endl;
       }
       (*it)->draw(img);
       /*

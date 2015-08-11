@@ -6,7 +6,8 @@
 #include <iostream>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <stdlib.h>
-
+#include <opencv/highgui.h>
+#include <opencv/cv.h>
 
 using namespace cv;
 using namespace std;

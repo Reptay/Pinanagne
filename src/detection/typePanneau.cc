@@ -30,7 +30,7 @@ Mat* isLimitation(Mat img, Circle* c)
 
   Mat imgRed = img.clone();
   RedFilter(imgRed);
-  int rayonFlou = 1; // pour le calcul hauteur et largeur du cercle rouge
+  int rayonFlou = 2; // pour le calcul hauteur et largeur du cercle rouge
   int minBande = 0;
   int hauteur =  getHauteur(imgRed, rayonFlou, cx, cy, minBande);
   int largeur = getLargeur(imgRed, rayonFlou, cx, cy, minBande);
@@ -39,11 +39,13 @@ Mat* isLimitation(Mat img, Circle* c)
   std::cout << "hauteur " << hauteur << std::endl;
   std::cout << "largeur " << largeur << std::endl;
   */
+
   if (largeur == 0 || hauteur == 0 ||
       2*largeur < r || 2*hauteur < r ||
       2*r < largeur || 2*r < hauteur)
     {
-      std::cerr<< "largeur ou hauteur non valide" << std::endl;
+      std::cerr<< "largeur ou hauteur non valide " << largeur
+	       << " " << hauteur<<std::endl;
       return NULL;
     }
 
@@ -81,9 +83,9 @@ Mat* isLimitation(Mat img, Circle* c)
 
       }
    BlackFilter(imgBlack);
-   /*
-   namedWindow("Display", WINDOW_AUTOSIZE);                                  
-   imshow("Display", imgBlack);   
+   /*   
+   namedWindow("DisplayBlack", WINDOW_AUTOSIZE);
+   imshow("DisplayBlack", imgBlack);   
    waitKey(0);
    */
    std::vector<int> sizes = nbCouleurContinu(&imgBlack,0,0,0);
