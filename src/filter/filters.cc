@@ -1,20 +1,27 @@
 #include "filters.hh"
 
-void RedFilter(Mat img)
+void dp(Mat img){
+  namedWindow("DisplayDp", WINDOW_AUTOSIZE);
+  imshow("DisplayDp", img);
+  waitKey(0);
+}
+void dp(Mat img, std::string str){
+  namedWindow("Display " + str, WINDOW_AUTOSIZE);
+  imshow("Display " + str, img);
+  waitKey(0);
+}
+
+Mat RedFilter(Mat img)
 {
-  /*
   Mat hsv = img.clone();
   cvtColor(img, hsv, CV_BGR2HSV);
 
   Mat mask1(img.size(), CV_8UC1);
   Mat mask2(img.size(), CV_8UC1);
 
-  
-
-
   int sMin = 150;
   int sMax = 255;
-  int vMin = 90;
+  int vMin = 60;
   int vMax = 255;
   int hTol=10;
 
@@ -22,45 +29,8 @@ void RedFilter(Mat img)
   inRange(hsv, Scalar(180-hTol, sMin, vMin), Scalar(180, sMax, vMax), mask2);
 
   Mat mask = mask1+mask2;
-
-  namedWindow("DisplayRed", WINDOW_AUTOSIZE);
-  imshow("DisplayRed", mask);
-  waitKey(0);
-
-  return;
-*/
-	for (int i = 0; i < img.cols; i++)
-		for (int j = 0; j < img.rows; j++)
-		{
-		  Point3_<uchar>* p = img.ptr<Point3_<uchar> >(j,i);
-
-			int r = p->z;
-			int g = p->y;
-			int b = p->x;
-			double diff;
-			if  (b==0||g==0)
-			  diff = 2;
-			else if (b>g)
-			  diff = b/g;
-			else
-			  diff = g/b;
-			if ((r > 2*(g+b) && r > 30) ||
-			    (r>80 && r>g+b) ||
-			    (r>120 && r>(g+b)*0.8)||
-			    (r>130 && r>g*0.9 &&r>b*0.9&&g < 150 &&
-			     b < 150 && diff < 1.3))
-			{
-				p->z = 0;
-				p->x = 0;
-				p->y = 0;
-			}
-			else
-			{
-				p->z = 255;
-				p->y = 255;
-				p->x = 255;
-			}
-		}
+  dp(mask);
+  return mask;
 }
 
 void BlueFilter(Mat img)
@@ -132,15 +102,22 @@ void BlackFilter(Mat img)
 	int r = p->z;
 	int g = p->y;
 	int b = p->x;
-	double diffrg = (r>g) ? r/g : g/r;
-	double diffrb = (r>b) ? r/b : b/r;
-	double diffgb = (g>b) ? g/b : b/g;
-
+	/*
+	double diffrg = 1;
+	if (r != 0 && g != 0)
+	  diffrg = (r>g) ? r/g : g/r;
+	double diffrb = 1;
+	if (r != 0 && b != 0)
+	  diffrb=(r>b) ? r/b : b/r;
+	double diffgb = 1;
+	if (g != 0 && b != 0)
+	  diffgb = (g>b) ? g/b : b/g;
+	*/
 	if ((r+g+b < 50 && r+g>b && r+b>g && g+b>r) ||
-	    (r+g+b<30) ||
+	    (r+g+b<30)) /*||
 	    (r < 50 && b < 50 && g < 50) ||
-	    (r<100 && b < 100 && g < 100 && r+g>b && r+b>g && g+b>r)||
-	    (diffrg < 1.3 && diffrb < 1.3 && diffgb < 1.3 && r+g+b<350))
+	    (r<100 && b < 100 && g < 100 && r+g>b && r+b>g && g+b>r)
+	    ||(diffrg < 1.3 && diffrb < 1.3 && diffgb < 1.3 && r+g+b<350))*/
 	  {
 	    p->z = 0;
 	    p->x = 0;

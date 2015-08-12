@@ -126,21 +126,24 @@ void traitementImage(char* path)
 }
 
 int main(int argc, char* argv[])
-{
-  std::string video = "tests/video/nationale/1/panneau1.mp4";
-  fluxWebcam(video);
- 
- if (argc == 2)
- {
-  Mat img;
-  img = imread(argv[1], CV_LOAD_IMAGE_COLOR);
-  if (img.data)
-  {
-	traitementImage(argv[1]);
-   return 0;
- } else {
-   return 1;
- }
- return 2;
- }
+{ 
+  if (argc == 1)
+    fluxWebcam(""); //webcam
+  else if (argc == 2)
+    fluxWebcam(argv[1]);
+  else if (argc == 3 && strcmp(argv[1], "-i")==0)
+    {
+      Mat img;
+      img = imread(argv[2], CV_LOAD_IMAGE_COLOR);
+      if (img.data)
+	{
+	  traitementImage(argv[2]);
+	  return 0;
+	} else {
+	return 1;
+      }
+      return 2;
+    }
+  else
+    std::cerr << "Invalide argument" << std::endl;
 }

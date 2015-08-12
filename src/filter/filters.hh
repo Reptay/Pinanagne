@@ -12,7 +12,9 @@
 using namespace cv;
 using namespace std;
 
-void RedFilter(Mat img);
+void dp(Mat img);
+void dp(Mat img, std::string str);
+Mat RedFilter(Mat img);
 void BlueFilter(Mat img);
 void BlueRedFilter(Mat img);
 void BlackFilter(Mat img);
