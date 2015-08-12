@@ -271,7 +271,7 @@ std::vector<int> nbCouleurContinu(Mat *img, int c)
 
   std::vector<int> sizes;
 
-  dp(*img);
+ 
   for (int i = 0; i < img->cols; i++)
     for (int j = 0; j < img->rows; j++)
       {
@@ -279,7 +279,6 @@ std::vector<int> nbCouleurContinu(Mat *img, int c)
 	if (pImg == c && !visite[j][i])
 	  {
 	    sizes.push_back(detecteZone(img, i, j, c, 0, visite));
-	    // dp(*img);
 	  }
       }
 
@@ -298,7 +297,6 @@ std::vector<int> nbCouleurContinu(Mat *img, int c)
 int detecteZone(Mat *img, int i, int j, int c, int size,
 		bool **visite)
 {
-  img->at<uchar>(j,i) = 150;
   visite[j][i] = true;
   size++;
 
