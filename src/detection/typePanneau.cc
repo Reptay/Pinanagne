@@ -2,7 +2,7 @@
 
 int getHauteur(Mat imgRed, int rayonFlou, int cx, int cy, int &minBande);
 int getLargeur(Mat imgRed, int rayonFlou, int cx, int cy, int &minBande);
-std::vector<int> nbCouleurContinu(Mat *img, int r, int g, int b);
+std::vector<int> nbCouleurContinu(Mat *img, int c);
 int min(int a, int b){
   if (a<b)
     return a;
@@ -82,13 +82,18 @@ Mat* isLimitation(Mat img, Circle* c)
 	  }
 
       }
-   BlackFilter(imgBlack);
-   /*   
-   namedWindow("DisplayBlack", WINDOW_AUTOSIZE);
-   imshow("DisplayBlack", imgBlack);   
-   waitKey(0);
-   */
-   std::vector<int> sizes = nbCouleurContinu(&imgBlack,0,0,0);
+   imgBlack = BlackFilter(imgBlack);
+
+   std::vector<int> sizes = nbCouleurContinu(&imgBlack,255);
+   // supprime les petites zones (bruit)
+   for (std::vector<int>::iterator it = sizes.begin(); it != sizes.end();){
+     if ((*it) < largeur*0.5){
+       std::cerr << " typePanneau.cc : rm forme continu " << 
+	 *it << " " <<largeur<<std::endl;
+       it = sizes.erase(it);
+     }
+     else it++;
+   }
    if (sizes.size() <= 1 || sizes.size() > 3){
      std::cerr << "typePanneau.cc Invalide nb de forme continu : " <<
        sizes.size() << std::endl;
@@ -102,8 +107,8 @@ Mat* isLimitation(Mat img, Circle* c)
 	   continue;
 	 double comp = compare(sizes[i], sizes[j]);
 	 if (comp>2)
-	   std::cerr << "typePanneau.cc Proportions des chiffres invalides"
-		     << std::endl;
+	   std::cerr << "typePanneau.cc Proportions des chiffres invalides "
+		     << sizes[i] <<" "<<sizes[j]<< std::endl;
        }
 
    return panneau;
@@ -206,6 +211,7 @@ int getLargeur(Mat imgRed, int rayonFlou, int cx, int cy, int &minBande){
   if (largeur == 0)
     return 0;
   findRed = 0;
+
   for (int i = cx; i >= 0; i--) // vers la gauche
     {
       Point3_<uchar>* p = imgRed.ptr<Point3_<uchar> >(cy,i);
@@ -232,11 +238,11 @@ int getLargeur(Mat imgRed, int rayonFlou, int cx, int cy, int &minBande){
               <<std::endl;
     return 0;
   }
-  if (largeur / bandeDroite < 3 || largeur / bandeDroite > 7 ||
-      largeur / bandeGauche < 3 || largeur / bandeGauche > 7){
+  if (largeur / bandeDroite < 3 || largeur / bandeDroite > 10 ||
+      largeur / bandeGauche < 3 || largeur / bandeGauche > 10){
     std::cout <<
-      "largeur disproportionné par rapport au contour, typePanneau.cc"<<
-      std::endl;
+      "largeur disproportionné par rapport au contour, typePanneau.cc "<<
+      largeur << " " << bandeGauche<< " " << bandeDroite <<  std::endl;
     return 0;
   }
   if (bandeGauche < minBande)
@@ -251,9 +257,9 @@ int getLargeur(Mat imgRed, int rayonFlou, int cx, int cy, int &minBande){
  * Cherche les zones de la couleur=(r,g,b) EXACT
  */
 
-int detecteZone(Mat *img, int i, int j, int r, int g, int b, int size,
+int detecteZone(Mat *img, int i, int j,int c, int size,
 		bool **visite);
-std::vector<int> nbCouleurContinu(Mat *img, int r, int g, int b)
+std::vector<int> nbCouleurContinu(Mat *img, int c)
 {
   bool** visite = new bool*[img->rows];
   for(int i = 0; i < img->rows; i++)
@@ -265,15 +271,18 @@ std::vector<int> nbCouleurContinu(Mat *img, int r, int g, int b)
 
   std::vector<int> sizes;
 
+  dp(*img);
   for (int i = 0; i < img->cols; i++)
     for (int j = 0; j < img->rows; j++)
       {
-	Point3_<uchar>* pImg = img->ptr<Point3_<uchar> >(j,i);
-	if (pImg->x == b && pImg->y == g && pImg->z == r && !visite[j][i])
+	int pImg = (int)img->at<uchar>(j,i);
+	if (pImg == c && !visite[j][i])
 	  {
-	    sizes.push_back(detecteZone(img, i, j, r, g, b, 0, visite));
+	    sizes.push_back(detecteZone(img, i, j, c, 0, visite));
+	    // dp(*img);
 	  }
       }
+
   for(int i = 0; i < img->rows; i++)
     {
       delete [] visite[i];
@@ -286,12 +295,12 @@ std::vector<int> nbCouleurContinu(Mat *img, int r, int g, int b)
 /**
  * explore une zone et retourne sa taille
  */
-int detecteZone(Mat *img, int i, int j, int r, int g, int b, int size,
+int detecteZone(Mat *img, int i, int j, int c, int size,
 		bool **visite)
 {
+  img->at<uchar>(j,i) = 150;
   visite[j][i] = true;
   size++;
-
 
   int rayonFlou = 2; // >= 1
   for (int x = rayonFlou*-1; x <= rayonFlou; x++)
@@ -299,24 +308,24 @@ int detecteZone(Mat *img, int i, int j, int r, int g, int b, int size,
       if(x==0)
 	continue;
       if (j+x < img->rows && !visite[j+x][i]){
-	Point3_<uchar>* pImg2 = img->ptr<Point3_<uchar> >(j+x,i);
-	if (pImg2->x == b && pImg2->y == g && pImg2->z == r)
-	  size = detecteZone(img, i, j+x, r, g, b, size, visite);
+	int pImg2 = (int)img->at<uchar>(j+x,i);
+	if (pImg2 == c)
+	  size = detecteZone(img, i, j+x, c, size, visite);
       }
       if (j-x >= 0 && !visite[j-x][i]){
-	Point3_<uchar>* pImg2 = img->ptr<Point3_<uchar> >(j-x,i);
-	if (pImg2->x == b && pImg2->y == g && pImg2->z == r)
-	  size = detecteZone(img, i, j-x, r, g, b, size, visite);
+	int pImg2 = (int)img->at<uchar>(j-x,i);
+	if (pImg2 == c)
+	  size = detecteZone(img, i, j-x, c, size, visite);
       }
       if (i+x < img->cols && !visite[j][i+x]){
-	Point3_<uchar>* pImg2 = img->ptr<Point3_<uchar> >(j,i+x);
-	if (pImg2->x == b && pImg2->y == g && pImg2->z == r)
-	  size = detecteZone(img, i+x, j, r, g, b, size, visite);
+	int pImg2 = (int)img->at<uchar>(j,i+x);
+	if (pImg2 == c)
+	  size = detecteZone(img, i+x, j, c, size, visite);
       }
       if (i-x >= 0 && !visite[j][i-x]){
-	Point3_<uchar>* pImg2 = img->ptr<Point3_<uchar> >(j,i-x);
-	if (pImg2->x == b && pImg2->y == g && pImg2->z == r)
-	  size = detecteZone(img, i-x, j, r, g, b, size, visite);
+	int pImg2 = (int)img->at<uchar>(j,i-x);
+	if (pImg2 == c)
+	  size = detecteZone(img, i-x, j, c, size, visite);
       }
 
     }

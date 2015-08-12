@@ -29,7 +29,7 @@ void fluxWebcam(std::string path)
     Mat img = cvarrToMat(image);
 
     std::vector<Circle*> circles = getCircles(img);
-    std::cerr << circles.size() << " ";
+    //    std::cerr << circles.size() << " ";
 
     std::vector<Mat> panneaux;
     for (std::vector<Circle*>::iterator it = circles.begin();

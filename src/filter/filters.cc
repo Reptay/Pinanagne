@@ -21,7 +21,7 @@ Mat RedFilter(Mat img)
 
   int sMin = 150;
   int sMax = 255;
-  int vMin = 60;
+  int vMin = 70;
   int vMax = 255;
   int hTol=10;
 
@@ -29,8 +29,26 @@ Mat RedFilter(Mat img)
   inRange(hsv, Scalar(180-hTol, sMin, vMin), Scalar(180, sMax, vMax), mask2);
 
   Mat mask = mask1+mask2;
-  dp(mask);
+  //  dp(mask);
   return mask;
+}
+
+Mat BlackFilter(Mat img)
+{
+  Mat hsv = img.clone();
+  cvtColor(img, hsv, CV_BGR2HSV);
+
+  Mat mask1(img.size(), CV_8UC1);
+
+  int sMin = 0;
+  int sMax = 255;
+  int vMin = 0;
+  int vMax = 70; //50
+
+
+  inRange(hsv, Scalar(0, sMin, vMin), Scalar(180, sMax, vMax), mask1);
+  return mask1;
+
 }
 
 void BlueFilter(Mat img)
@@ -91,9 +109,10 @@ void BlueRedFilter(Mat img)
 		}
 
 }
-
-void BlackFilter(Mat img)
+/*
+Mat BlackFilter(Mat img)
 {
+ 
   for (int i = 0; i < img.cols; i++)
     for (int j = 0; j < img.rows; j++)
       {
@@ -102,7 +121,7 @@ void BlackFilter(Mat img)
 	int r = p->z;
 	int g = p->y;
 	int b = p->x;
-	/*
+	/ *
 	double diffrg = 1;
 	if (r != 0 && g != 0)
 	  diffrg = (r>g) ? r/g : g/r;
@@ -112,26 +131,27 @@ void BlackFilter(Mat img)
 	double diffgb = 1;
 	if (g != 0 && b != 0)
 	  diffgb = (g>b) ? g/b : b/g;
-	*/
+	* /
 	if ((r+g+b < 50 && r+g>b && r+b>g && g+b>r) ||
-	    (r+g+b<30)) /*||
+	    (r+g+b<30)) / *||
 	    (r < 50 && b < 50 && g < 50) ||
 	    (r<100 && b < 100 && g < 100 && r+g>b && r+b>g && g+b>r)
-	    ||(diffrg < 1.3 && diffrb < 1.3 && diffgb < 1.3 && r+g+b<350))*/
+	    ||(diffrg < 1.3 && diffrb < 1.3 && diffgb < 1.3 && r+g+b<350))* /
 	  {
-	    p->z = 0;
-	    p->x = 0;
-	    p->y = 0;
+	    p->z = 255;
+	    p->x = 255;
+	    p->y = 255;
 	  }
 	else
 	  {
-	    p->z = 255;
-	    p->y = 255;
-	    p->x = 255;
+	    p->z = 0;
+	    p->y = 0;
+	    p->x = 0;
 	  }
 
       }
-}
+  
+      }*/
 
 void To_TSV(Mat img)
 {
