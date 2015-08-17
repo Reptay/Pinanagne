@@ -3,6 +3,7 @@
 #include "detection/shape.hh"
 #include "detection/typePanneau.hh"
 #include "ransac/ransac.hh"
+#include "audio/audio.hh"
 
 void fluxWebcam(std::string path)
 {
@@ -127,6 +128,7 @@ void traitementImage(char* path)
 
 int main(int argc, char* argv[])
 { 
+  //testAudio();
   if (argc == 1)
     fluxWebcam(""); //webcam
   else if (argc == 2)
