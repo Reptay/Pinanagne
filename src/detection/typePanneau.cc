@@ -110,9 +110,11 @@ Mat* isLimitation(Mat img, Circle* c)
 	 if (i == j)
 	   continue;
 	 double comp = compare(sizes[i], sizes[j]);
-	 if (comp>2)
+	 if (comp>2){
 	   std::cerr << "typePanneau.cc Proportions des chiffres invalides "
 		     << sizes[i] <<" "<<sizes[j]<< std::endl;
+	   return NULL;
+	 }
        }
 
    return panneau;
@@ -123,6 +125,7 @@ Mat* isLimitation(Mat img, Circle* c)
  * Retourne la moitié de la hauteur total du panneau + le rayonFlou
  */
 int getHauteur(Mat imgRed, int rayonFlou, int cx, int cy, int &minBande){
+  //  dp(imgRed);
   int hauteur = 0;
   int findRed = 0;
   int bandeHaut = 0; //largeur de la partie rouge
@@ -309,22 +312,22 @@ int detecteZone(Mat *img, int i, int j, int c, int size,
     {
       if(x==0)
 	continue;
-      if (j+x < img->rows && !visite[j+x][i]){
+      if (j+x < img->rows && j+x>=0 && !visite[j+x][i]){
 	int pImg2 = (int)img->at<uchar>(j+x,i);
 	if (pImg2 == c)
 	  size = detecteZone(img, i, j+x, c, size, visite);
       }
-      if (j-x >= 0 && !visite[j-x][i]){
+      if (j-x >= 0 && j-x < img->rows && !visite[j-x][i]){
 	int pImg2 = (int)img->at<uchar>(j-x,i);
 	if (pImg2 == c)
 	  size = detecteZone(img, i, j-x, c, size, visite);
       }
-      if (i+x < img->cols && !visite[j][i+x]){
+      if (i+x < img->cols && i+x >= 0 &&!visite[j][i+x]){
 	int pImg2 = (int)img->at<uchar>(j,i+x);
 	if (pImg2 == c)
 	  size = detecteZone(img, i+x, j, c, size, visite);
       }
-      if (i-x >= 0 && !visite[j][i-x]){
+      if (i-x >= 0 && i-x<img->cols && !visite[j][i-x]){
 	int pImg2 = (int)img->at<uchar>(j,i-x);
 	if (pImg2 == c)
 	  size = detecteZone(img, i-x, j, c, size, visite);

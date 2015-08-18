@@ -19,11 +19,11 @@ Mat RedFilter(Mat img)
   Mat mask1(img.size(), CV_8UC1);
   Mat mask2(img.size(), CV_8UC1);
 
-  int sMin = 150;
+  int sMin = 100;
   int sMax = 255;
-  int vMin = 70;
+  int vMin = 30;
   int vMax = 255;
-  int hTol=10;
+  int hTol=15;
 
   inRange(hsv, Scalar(0, sMin, vMin), Scalar(hTol, sMax, vMax), mask1);
   inRange(hsv, Scalar(180-hTol, sMin, vMin), Scalar(180, sMax, vMax), mask2);

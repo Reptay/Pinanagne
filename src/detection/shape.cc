@@ -1,9 +1,13 @@
 #include "shape.hh"
 
+using namespace cv;
+using namespace std;
+
+
 std::vector<Circle*> getCircles(Mat img){
   std::vector<Circle*> vCircles;
-  Mat img_gray;
-  
+
+  Mat img_gray;  
   //cvtColor(img, img_gray, CV_BGR2GRAY);
   if(img.empty())
     return std::vector<Circle*>();
@@ -19,8 +23,8 @@ std::vector<Circle*> getCircles(Mat img){
 
   /// Apply the Hough Transform to find the circles
   HoughCircles(img_gray, circles, CV_HOUGH_GRADIENT, 1.2,
-  	       img_gray.rows/8,200, 100, 0, 0 );
-
+  	       img_gray.rows/8,170, 100, 0, 0 );
+  //                           ^^^ parametre important
 
   /// Draw the circles detected
 
