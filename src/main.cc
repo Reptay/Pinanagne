@@ -128,7 +128,7 @@ void traitementImage(char* path)
 
 int main(int argc, char* argv[])
 { 
-  //testAudio();
+  //playSound("audio/50.wav");
   if (argc == 1)
     fluxWebcam(""); //webcam
   else if (argc == 2)

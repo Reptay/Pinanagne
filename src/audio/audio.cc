@@ -1,6 +1,6 @@
 #include "audio.hh"
 
-int testAudio()
+int playSound2(std::string path)
 {
   if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) != 0) {
     fprintf(stderr, "Unable to initialize SDL: %s\n", SDL_GetError());
@@ -12,14 +12,14 @@ int testAudio()
   int audio_channels = 2;
   int audio_buffers = 4096;
 
-  if(Mix_OpenAudio(audio_rate, audio_format, audio_channels, audio_buffers) != 
+  if(Mix_OpenAudio(audio_rate, audio_format, audio_channels, audio_buffers) !=
      0) {
     fprintf(stderr, "Unable to initialize audio: %s\n", Mix_GetError());
     exit(1);
   }
   Mix_Chunk *sound = NULL;
 
-  sound = Mix_LoadWAV("audio/50.wav");
+  sound = Mix_LoadWAV(path.c_str());
   if(sound == NULL) {
     fprintf(stderr, "Unable to load WAV file: %s\n", Mix_GetError());
   }
@@ -36,4 +36,10 @@ int testAudio()
   Mix_CloseAudio();
   SDL_Quit();
   return 0;
+}
+
+void playSound(std::string path)
+{
+  std::thread th(playSound2, path);
+  th.detach();
 }
