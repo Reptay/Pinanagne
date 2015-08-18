@@ -28,7 +28,12 @@ void fluxWebcam(std::string path)
     // On récupère une image
     image = cvQueryFrame(capture);
     Mat img = cvarrToMat(image);
-
+    if (img.empty())
+      break;
+    
+    double factor = 0.5;
+    resize(img, img, Size(), factor, factor, cv::INTER_LANCZOS4);
+    
     std::vector<Circle*> circles = getCircles(img);
     //    std::cerr << circles.size() << " ";
 

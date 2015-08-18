@@ -33,6 +33,10 @@ Mat* isLimitation(Mat img, Circle* c)
   int rayonFlou = 2; // pour le calcul hauteur et largeur du cercle rouge
   int minBande = 0;
   int hauteur =  getHauteur(imgRed, rayonFlou, cx, cy, minBande);
+  if (hauteur == 0){
+    std::cerr << "hauteur == 0" << std::endl;
+    return NULL;
+  }
   int largeur = getLargeur(imgRed, rayonFlou, cx, cy, minBande);
   /*
   std::cout << "rayon " << r << std::endl;

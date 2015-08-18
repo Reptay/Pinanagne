@@ -30,6 +30,21 @@ checkstd : all #panneaux vitesse standard
 	./pinanagne -i tests/img/panneau-vitesse-standard/panneau110.jpg   
 	./pinanagne -i tests/img/panneau-vitesse-standard/panneau130.png  
 
+checkslow: all
+	./pinanagne tests/video/vitesse_reduite/panneau_30_1.mp4
+	./pinanagne tests/video/vitesse_reduite/faux_positif_1.mp4
+	./pinanagne tests/video/vitesse_reduite/faux_positif_2.mp4
+	./pinanagne tests/video/vitesse_reduite/faux_positif_3.mp4
+	./pinanagne tests/video/vitesse_reduite/faux_positif_4.mp4
+check50: all
+	./pinanagne tests/video/vitesse_reel_inf50/panneau_30_1.mp4
+	./pinanagne tests/video/vitesse_reel_inf50/ panneau_30_2.mp4
+	./pinanagne tests/video/vitesse_reel_inf50/faux_positif_1.mp4
+	./pinanagne tests/video/vitesse_reel_inf50/panneau_50_1.mp4
+	./pinanagne tests/video/vitesse_reel_inf50/panneau_30_3.mp4
+	./pinanagne tests/video/vitesse_reel_inf50/panneau_50_2.mp4
+	./pinanagne tests/video/vitesse_reel_inf50/panneau_50_3.mp4
+
 checkv1: all
 	./pinanagne tests/video/nationale/1/panneau1.mp4
 

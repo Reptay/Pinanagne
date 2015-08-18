@@ -3,7 +3,14 @@
 std::vector<Circle*> getCircles(Mat img){
   std::vector<Circle*> vCircles;
   Mat img_gray;
-  cvtColor(img, img_gray, CV_BGR2GRAY);
+  
+  //cvtColor(img, img_gray, CV_BGR2GRAY);
+  if(img.empty())
+    return std::vector<Circle*>();
+  else if(img.channels()>1)
+    cvtColor(img, img_gray, CV_BGR2GRAY);
+  else img_gray = img;
+
 
   /// Reduce the noise so we avoid false circle detection
   GaussianBlur(img_gray, img_gray, Size(3,3), 2, 2);
