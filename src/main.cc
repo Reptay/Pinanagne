@@ -40,6 +40,34 @@ void fluxWebcam(std::string path)
   exit(0);
 }
 
+void ReadWebcam(char* path)
+{
+	std::string s(path);
+	VideoCapture v(s);
+	std::cout << s << std::endl;
+	if (!v.isOpened())
+		return;
+	for(;;)
+	{
+		Mat frame;
+		v >> frame;
+		imshow("frame", frame);
+		waitKey();
+	}
+}
+
+void ReadWebcam(int device)
+{
+	VideoCapture v = VideoCapture(device);
+	for(;;)
+	{
+		Mat frame;
+		v >> frame;
+		imshow("frame", frame);
+		waitKey();
+	}
+}
+
 void traitementImage(char* path)
 {
   Mat img;
@@ -94,10 +122,11 @@ void traitementImage(char* path)
 }
 
 int main(int argc, char* argv[])
-{/*
+{
   std::string video = "tests/video/nationale/1/panneau1.mp4";
   fluxWebcam(video);
- */
+ 
+ /**
  if (argc == 2)
  {
   Mat img;
@@ -110,5 +139,9 @@ int main(int argc, char* argv[])
    return 1;
  }
  return 2;
- }
+ }*/
+ argc = argc;
+ argv = argv;
+ //ReadWebcam(argv[1]);
+ return 0;
 }
