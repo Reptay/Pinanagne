@@ -6,14 +6,18 @@
 #include <iostream>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <stdlib.h>
-
+#include <opencv/highgui.h>
+#include <opencv/cv.h>
 
 using namespace cv;
 using namespace std;
 
-void RedFilter(Mat img);
+void dp(Mat img);
+void dp(Mat img, std::string str);
+Mat RedFilter(Mat img);
 void BlueFilter(Mat img);
 void BlueRedFilter(Mat img);
+Mat BlackFilter(Mat img);
 void getContour(Mat& img);
 void getOrientation(Mat& img);
 Point findcenter(Mat img, vector<vector<Point> >* ret);

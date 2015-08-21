@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <vector>
+#include <math.h>
 #include "circle.hh"
 #include "../filter/filters.hh"
 

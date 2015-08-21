@@ -3,9 +3,11 @@
 #include "detection/shape.hh"
 #include "detection/typePanneau.hh"
 #include "ransac/ransac.hh"
+#include "audio/audio.hh"
 
 void fluxWebcam(std::string path)
 {
+  //  path = "";
   CvCapture *capture;
   if (path.empty()) // pas testé pour la webcam
     capture = cvCreateCameraCapture( CV_CAP_ANY );
@@ -16,6 +18,8 @@ void fluxWebcam(std::string path)
     exit(1);
   }
 
+
+
   char key;
   IplImage *image;
   // cvNamedWindow("Webcam", CV_WINDOW_AUTOSIZE);
@@ -23,12 +27,43 @@ void fluxWebcam(std::string path)
   while(key != 'q' && key != 'Q') {
     // On récupère une image
     image = cvQueryFrame(capture);
-
     Mat img = cvarrToMat(image);
-    //    std::vector<Circle*> circles = getCircle(img);
-    /* Si c != NULL alors RANSAC */
+    if (img.empty())
+      break;
+    
+    double factor = 0.5;
+    resize(img, img, Size(), factor, factor, cv::INTER_LANCZOS4);
+    
+    std::vector<Circle*> circles = getCircles(img);
+    //    std::cerr << circles.size() << " ";
 
-    cvShowImage( "Webcam", image);
+    std::vector<Mat> panneaux;
+    for (std::vector<Circle*>::iterator it = circles.begin();
+	 it != circles.end(); it++){
+      Mat* m = isLimitation(img, *it);
+      if (m != NULL){
+	panneaux.push_back(*m);
+	std::cerr <<std::endl<<
+	  "----------------" <<"OK"<<"----------------" << std::endl;
+      }
+      (*it)->draw(img);
+      /*
+      namedWindow("Display2", WINDOW_AUTOSIZE);
+      imshow("Display2", img);
+      waitKey(0);
+      */
+
+    }
+    for (std::vector<Mat>::iterator it = panneaux.begin();
+	 it != panneaux.end(); it++){
+      namedWindow("Display", WINDOW_AUTOSIZE);
+      imshow("Display", *it);
+      waitKey(0);
+      // RANSAC ICI, normalement il y a un panneau au maximum dans le vector
+    }
+
+    IplImage image2=img;
+    cvShowImage( "Webcam", &image2);
     // On attend 10ms
     key = cvWaitKey(1);
  
@@ -118,30 +153,32 @@ void traitementImage(char* path)
       /***************************************************/
     }
   else
-    exit(1);
+    {
+      std::cerr << "Ouverture de l'image impossible" << std::endl;
+      exit(1);
+    }
 }
 
 int main(int argc, char* argv[])
-{
-  std::string video = "tests/video/nationale/1/panneau1.mp4";
-  fluxWebcam(video);
- 
- /**
- if (argc == 2)
- {
-  Mat img;
-  img = imread(argv[1], CV_LOAD_IMAGE_COLOR);
-  if (img.data)
-  {
-	traitementImage(argv[1]);
-   return 0;
- } else {
-   return 1;
- }
- return 2;
- }*/
- argc = argc;
- argv = argv;
- //ReadWebcam(argv[1]);
- return 0;
+{ 
+  //playSound("audio/50.wav");
+  if (argc == 1)
+    fluxWebcam(""); //webcam
+  else if (argc == 2)
+    fluxWebcam(argv[1]);
+  else if (argc == 3 && strcmp(argv[1], "-i")==0)
+    {
+      Mat img;
+      img = imread(argv[2], CV_LOAD_IMAGE_COLOR);
+      if (img.data)
+	{
+	  traitementImage(argv[2]);
+	  return 0;
+	} else {
+	return 1;
+      }
+      return 2;
+    }
+  else
+    std::cerr << "Invalide argument" << std::endl;
 }

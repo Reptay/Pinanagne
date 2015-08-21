@@ -1,7 +1,23 @@
 #include "typePanneau.hh"
 
-int getHauteur(Mat imgRed, int rayonFlou, int cx, int cy);
-int getLargeur(Mat imgRed, int rayonFlou, int cx, int cy);
+int getHauteur(Mat imgRed, int rayonFlou, int cx, int cy, int &minBande);
+int getLargeur(Mat imgRed, int rayonFlou, int cx, int cy, int &minBande);
+std::vector<int> nbCouleurContinu(Mat *img, int c);
+int min(int a, int b){
+  if (a<b)
+    return a;
+  else
+    return b;
+}
+double compare(int a, int b)
+{
+  double i = a;
+  double j = b;
+  if (i > j)
+    return i / j;
+  else
+    return j / i;
+}
 
 Mat* isLimitation(Mat img, Circle* c)
 {
@@ -12,30 +28,94 @@ Mat* isLimitation(Mat img, Circle* c)
   int cx = c->getCenter().x;
   int cy = c->getCenter().y;
 
-  Mat imgRed = img.clone();
-  RedFilter(imgRed);
-  int rayonFlou = 1; // pour le calcul hauteur et largeur du cercle rouge
-  int hauteur =  getHauteur(imgRed, rayonFlou, cx, cy);
-  int largeur = getLargeur(imgRed, rayonFlou, cx, cy);
+  //  Mat imgRed = img.clone();
+  Mat imgRed = RedFilter(img);
+  int rayonFlou = 2; // pour le calcul hauteur et largeur du cercle rouge
+  int minBande = 0;
+  int hauteur =  getHauteur(imgRed, rayonFlou, cx, cy, minBande);
+  if (hauteur == 0){
+    std::cerr << "hauteur == 0" << std::endl;
+    return NULL;
+  }
+  int largeur = getLargeur(imgRed, rayonFlou, cx, cy, minBande);
+  /*
   std::cout << "rayon " << r << std::endl;
   std::cout << "hauteur " << hauteur << std::endl;
   std::cout << "largeur " << largeur << std::endl;
+  */
 
   if (largeur == 0 || hauteur == 0 ||
       2*largeur < r || 2*hauteur < r ||
       2*r < largeur || 2*r < hauteur)
-    return NULL;
+    {
+      std::cerr<< "largeur ou hauteur non valide " << largeur
+	       << " " << hauteur<<std::endl;
+      return NULL;
+    }
 
   /* créé l'image du panneau uniquement */
+  //cercle de l'image du panneau uniqueement
+  Circle* c2 = new Circle(Point(largeur, hauteur),
+			  min(hauteur, largeur));
+  minBande += rayonFlou;
+
   Mat* panneau = new Mat(2*hauteur, 2*largeur,CV_8UC3, Scalar(0,0,0));
   for (int i = cx-largeur; i < cx+largeur; i++)
     for (int j = cy-hauteur; j < cy+hauteur; j++){
+
      Point3_<uchar>* pImg = img.ptr<Point3_<uchar> >(j,i);
      Point3_<uchar>* pPan = panneau->ptr<Point3_<uchar>>(j-cy+hauteur,i-cx+largeur);
      pPan->x = pImg->x;
      pPan->y = pImg->y;
      pPan->z = pImg->z;
    }
+
+  /* Rend blanc l'exterieur du panneau, pour ne pas analyser le fond */
+  Mat imgBlack = panneau->clone();
+  for (int i = 0; i < imgBlack.cols; i++)
+    for (int j = 0; j < imgBlack.rows; j++)
+      {
+	Point3_<uchar>* pImg = imgBlack.ptr<Point3_<uchar> >(j,i);
+	int distCentre = sqrt(pow((j - c2->getCenter().x), 2) +
+			      pow((i - c2->getCenter().y), 2));
+	if (distCentre >= c2->getRadius() - minBande)
+	  {
+	    pImg->x = 255;
+	    pImg->y = 255;
+	    pImg->z = 255;
+	  }
+
+      }
+   imgBlack = BlackFilter(imgBlack);
+
+   std::vector<int> sizes = nbCouleurContinu(&imgBlack,255);
+   // supprime les petites zones (bruit)
+   for (std::vector<int>::iterator it = sizes.begin(); it != sizes.end();){
+     if ((*it) < largeur*0.5){
+       std::cerr << " typePanneau.cc : rm forme continu " << 
+	 *it << " " <<largeur<<std::endl;
+       it = sizes.erase(it);
+     }
+     else it++;
+   }
+   if (sizes.size() <= 1 || sizes.size() > 3){
+     std::cerr << "typePanneau.cc Invalide nb de forme continu : " <<
+       sizes.size() << std::endl;
+     return NULL;
+   }
+
+   for (unsigned long i = 0; i < sizes.size()-1; i++)
+     for (unsigned long j = 1; j < sizes.size(); j++)
+       {
+	 if (i == j)
+	   continue;
+	 double comp = compare(sizes[i], sizes[j]);
+	 if (comp>2){
+	   std::cerr << "typePanneau.cc Proportions des chiffres invalides "
+		     << sizes[i] <<" "<<sizes[j]<< std::endl;
+	   return NULL;
+	 }
+       }
 
    return panneau;
 }
@@ -44,7 +124,8 @@ Mat* isLimitation(Mat img, Circle* c)
 /**
  * Retourne la moitié de la hauteur total du panneau + le rayonFlou
  */
-int getHauteur(Mat imgRed, int rayonFlou, int cx, int cy){
+int getHauteur(Mat imgRed, int rayonFlou, int cx, int cy, int &minBande){
+  //  dp(imgRed);
   int hauteur = 0;
   int findRed = 0;
   int bandeHaut = 0; //largeur de la partie rouge
@@ -53,12 +134,13 @@ int getHauteur(Mat imgRed, int rayonFlou, int cx, int cy){
   for(int i = cy; i < imgRed.rows; i++) // vers le bas
     {
       Point3_<uchar>* p = imgRed.ptr<Point3_<uchar> >(i,cx);
-      int r = p->z; // 0 = rouge, 255 = autre
-      if (r == 0){ // on est sur du rouge
+      int r = p->z; // 255 = rouge, 0 = autre
+
+      if (r == 255){ // on est sur du rouge
         findRed = 1;
 	bandeBas++;
       }
-      else if (r != 0 && findRed <= rayonFlou && findRed != 0 &&
+      else if (r != 255 && findRed <= rayonFlou && findRed != 0 &&
 	       i < imgRed.rows-1){
         findRed++; // on est pas sur du rouge mais on en a deja vu (rayonFlou)
       }
@@ -74,11 +156,11 @@ int getHauteur(Mat imgRed, int rayonFlou, int cx, int cy){
     {
       Point3_<uchar>* p = imgRed.ptr<Point3_<uchar> >(i,cx);
       int r = p->z; // 0 = rouge, 255 = autre
-      if (r == 0){
+      if (r == 255){
         findRed = 1;
 	bandeHaut++;
       }
-      else if (r != 0 && findRed <= rayonFlou && findRed != 0){
+      else if (r != 255 && findRed <= rayonFlou && findRed != 0){
         findRed++;
       }
       else if (findRed != 0){
@@ -87,6 +169,10 @@ int getHauteur(Mat imgRed, int rayonFlou, int cx, int cy){
         break;
       }
     }
+  if (bandeBas == 0 || bandeHaut == 0){
+    std::cerr << "Bande haut ou bas = 0" << std::endl;
+    return 0;
+  }
   if (bandeBas*2 < bandeHaut || bandeHaut*2 < bandeBas){
     std::cout << "Bande haut et bande bas disproportionné, typePanneau.cc"
 	      <<std::endl;
@@ -99,14 +185,16 @@ int getHauteur(Mat imgRed, int rayonFlou, int cx, int cy){
       std::endl;
     return 0;
   }
-  // 3 < < 7
+  minBande = bandeHaut;
+  if (bandeBas < minBande)
+    minBande = bandeBas;
   return hauteur;
 }
 
 /**
  * Fait la meme chose que getHauteur mais pour la largeur
  */
-int getLargeur(Mat imgRed, int rayonFlou, int cx, int cy){
+int getLargeur(Mat imgRed, int rayonFlou, int cx, int cy, int &minBande){
   int largeur = 0;
   int findRed = 0;
   int bandeDroite = 0;
@@ -115,12 +203,12 @@ int getLargeur(Mat imgRed, int rayonFlou, int cx, int cy){
   for (int i = cx; i < imgRed.cols; i++) // vers la droite
     {
       Point3_<uchar>* p = imgRed.ptr<Point3_<uchar> >(cy,i);
-      int r = p->z; // 0 = rouge, 255 = autre
-      if (r == 0){
+      int r = p->z; // 255 = rouge, 0 = autre
+      if (r == 255){
         findRed = 1;
 	bandeDroite++;
       }
-      else if (r != 0 && findRed <= rayonFlou && findRed != 0)
+      else if (r != 255 && findRed <= rayonFlou && findRed != 0)
         findRed++;
       else if (findRed != 0){
         largeur = i - cx;
@@ -130,15 +218,16 @@ int getLargeur(Mat imgRed, int rayonFlou, int cx, int cy){
   if (largeur == 0)
     return 0;
   findRed = 0;
+
   for (int i = cx; i >= 0; i--) // vers la gauche
     {
       Point3_<uchar>* p = imgRed.ptr<Point3_<uchar> >(cy,i);
-      int r = p->z; // 0 = rouge, 255 = autre
-      if (r == 0){
+      int r = p->z;
+      if (r == 255){
         findRed = 1;
 	bandeGauche++;
       }
-      else if (r != 0 && findRed <= rayonFlou && findRed != 0)
+      else if (r != 255 && findRed <= rayonFlou && findRed != 0)
         findRed++;
       else if (findRed != 0){
 	if (cx -i > largeur)
@@ -147,18 +236,126 @@ int getLargeur(Mat imgRed, int rayonFlou, int cx, int cy){
       }
     }
 
+  if (bandeDroite == 0 || bandeGauche == 0){
+    std::cerr << "Bande gauche ou droite = 0"<<std::endl;
+    return 0;
+  }
   if (bandeDroite*2 < bandeGauche || bandeGauche*2 < bandeDroite){
     std::cout << "Bande gauche et bande droite disproportionné, typePanneau.cc"
               <<std::endl;
     return 0;
   }
-  if (largeur / bandeDroite < 3 || largeur / bandeDroite > 7 ||
-      largeur / bandeGauche < 3 || largeur / bandeGauche > 7){
+  if (largeur / bandeDroite < 3 || largeur / bandeDroite > 10 ||
+      largeur / bandeGauche < 3 || largeur / bandeGauche > 10){
     std::cout <<
-      "largeur disproportionné par rapport au contour, typePanneau.cc"<<
-      std::endl;
+      "largeur disproportionné par rapport au contour, typePanneau.cc "<<
+      largeur << " " << bandeGauche<< " " << bandeDroite <<  std::endl;
     return 0;
   }
-
+  if (bandeGauche < minBande)
+    minBande = bandeGauche;
+  if (bandeDroite < minBande)
+    minBande = bandeDroite;
   return largeur;
+}
+
+
+/**
+ * Cherche les zones de la couleur=(r,g,b) EXACT
+ */
+
+int detecteZone(Mat *img, int i, int j,int c, int size,
+		bool **visite);
+std::vector<int> nbCouleurContinu(Mat *img, int c)
+{
+  bool** visite = new bool*[img->rows];
+  for(int i = 0; i < img->rows; i++)
+    visite[i] = new bool[img->cols];
+  for (int i = 0; i < img->rows; i++)
+    for (int j = 0; j < img->cols;j++){
+      visite[i][j] = false;
+    }
+
+  std::vector<int> sizes;
+
+ 
+  for (int i = 0; i < img->cols; i++)
+    for (int j = 0; j < img->rows; j++)
+      {
+	int pImg = (int)img->at<uchar>(j,i);
+	if (pImg == c && !visite[j][i])
+	  {
+	    sizes.push_back(detecteZone(img, i, j, c, 0, visite));
+	  }
+      }
+
+  for(int i = 0; i < img->rows; i++)
+    {
+      delete [] visite[i];
+    }
+  delete [] visite;
+
+  return sizes;
+}
+
+/**
+ * explore une zone et retourne sa taille
+ */
+int detecteZone(Mat *img, int i, int j, int c, int size,
+		bool **visite)
+{
+  visite[j][i] = true;
+  size++;
+
+  int rayonFlou = 2; // >= 1
+  for (int x = rayonFlou*-1; x <= rayonFlou; x++)
+    {
+      if(x==0)
+	continue;
+      if (j+x < img->rows && j+x>=0 && !visite[j+x][i]){
+	int pImg2 = (int)img->at<uchar>(j+x,i);
+	if (pImg2 == c)
+	  size = detecteZone(img, i, j+x, c, size, visite);
+      }
+      if (j-x >= 0 && j-x < img->rows && !visite[j-x][i]){
+	int pImg2 = (int)img->at<uchar>(j-x,i);
+	if (pImg2 == c)
+	  size = detecteZone(img, i, j-x, c, size, visite);
+      }
+      if (i+x < img->cols && i+x >= 0 &&!visite[j][i+x]){
+	int pImg2 = (int)img->at<uchar>(j,i+x);
+	if (pImg2 == c)
+	  size = detecteZone(img, i+x, j, c, size, visite);
+      }
+      if (i-x >= 0 && i-x<img->cols && !visite[j][i-x]){
+	int pImg2 = (int)img->at<uchar>(j,i-x);
+	if (pImg2 == c)
+	  size = detecteZone(img, i-x, j, c, size, visite);
+      }
+
+    }
+
+  /*
+  if (j+1 < img->rows && !visite[j+1][i]){
+    Point3_<uchar>* pImg2 = img->ptr<Point3_<uchar> >(j+1,i);
+    if (pImg2->x == b && pImg2->y == g && pImg2->z == r)
+      size = detecteZone(img, i, j+1, r, g, b, size, visite);
+  }
+  if (j-1 >= 0 && !visite[j-1][i]){
+    Point3_<uchar>* pImg2 = img->ptr<Point3_<uchar> >(j-1,i);
+    if (pImg2->x == b && pImg2->y == g && pImg2->z == r)
+      size = detecteZone(img, i, j-1, r, g, b, size, visite);
+  }
+  if (i+1 < img->cols && !visite[j][i+1]){
+    Point3_<uchar>* pImg2 = img->ptr<Point3_<uchar> >(j,i+1);
+    if (pImg2->x == b && pImg2->y == g && pImg2->z == r)
+      size = detecteZone(img, i+1, j, r, g, b, size, visite);
+  }
+  if (i-1 >= 0 && !visite[j][i-1]){
+    Point3_<uchar>* pImg2 = img->ptr<Point3_<uchar> >(j,i-1);
+    if (pImg2->x == b && pImg2->y == g && pImg2->z == r)
+      size = detecteZone(img, i-1, j, r, g, b, size, visite);
+  }
+  */
+  return size;
 }
