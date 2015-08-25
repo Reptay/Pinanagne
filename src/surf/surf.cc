@@ -52,7 +52,7 @@ void findObject(Mat sceneP, Mat objectP, int minHessian, Scalar color, Mat outIm
 
   for(int i = 0; i < descriptors_object.rows; i++)
   {
-	  if( matches[i].distance < 3*min_dist) 
+	  if( matches[i].distance < 3 * min_dist) 
 		  good_matches.push_back( matches[i] );
   }
 

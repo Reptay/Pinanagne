@@ -144,15 +144,16 @@ waitKey(0);
 }
 				}
 		}*/
+		Mat mod = imread("./modeles/130km3.png");
 		Mat dst = *it;
+		if (dst.cols < mod.cols && dst.rows < mod.rows)
 		pyrUp(*it, dst, Size(dst.cols * 2, dst.rows * 2));
-		Mat dest = dst;
-		pyrUp(dst, dest, Size(dst.cols * 2, dst.rows * 2));
+		//Mat dest = dst;
+		//pyrUp(dst, dest, Size(dst.cols * 2, dst.rows * 2));
 		//dst = dest;
 		//pyrUp(dest, dst, Size(dest.cols*2, dest.rows*2));
-		Mat mod = imread("./modeles/110km.jpg");
-		Mat outImg = dest;
-		findObject(dest, mod, 2500, Scalar(255,0,0), outImg);
+		Mat outImg = dst;
+		findObject(dst, mod, 2500, Scalar(255,0,0), outImg);
 		imshow("Test", outImg);
 waitKey(0);
 	/*namedWindow("Display", WINDOW_AUTOSIZE);
