@@ -4,8 +4,8 @@
 #include <stdlib.h>
 #include <string>
 #include <thread>
-#include <SDL/SDL.h>
-#include <SDL/SDL_mixer.h>
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_mixer.h>
 
 void playSound(std::string path);
 

@@ -4,6 +4,8 @@
 #include "detection/typePanneau.hh"
 #include "ransac/ransac.hh"
 #include "audio/audio.hh"
+#include "surf/surf.hh"
+#include <dirent.h>
 
 void fluxWebcam(std::string path)
 {
@@ -121,9 +123,41 @@ void traitementImage(char* path)
       }
       for (std::vector<Mat>::iterator it = panneaux.begin();
            it != panneaux.end(); it++){
-	namedWindow("Display", WINDOW_AUTOSIZE);
+	/*DIR* d;
+	  d = opendir("./modeles");
+		if (!d)
+			return;
+		struct dirent* f;
+		while ((f = readdir(d)))
+		{
+			string st = "./modeles";
+			st += f->d_name;
+			Mat mod = imread(st);
+			if (img.data)
+				{
+					Mat outImg = *it;
+					if (outImg.data)
+{
+					findObject(*it, mod, 2500, Scalar(255,0,0), outImg);
+					imshow("Test", outImg);
+waitKey(0);
+}
+				}
+		}*/
+		Mat dst = *it;
+		pyrUp(*it, dst, Size(dst.cols * 2, dst.rows * 2));
+		Mat dest = dst;
+		pyrUp(dst, dest, Size(dst.cols * 2, dst.rows * 2));
+		//dst = dest;
+		//pyrUp(dest, dst, Size(dest.cols*2, dest.rows*2));
+		Mat mod = imread("./modeles/110km.jpg");
+		Mat outImg = dest;
+		findObject(dest, mod, 2500, Scalar(255,0,0), outImg);
+		imshow("Test", outImg);
+waitKey(0);
+	/*namedWindow("Display", WINDOW_AUTOSIZE);
 	imshow("Display", *it);
-	waitKey(0);
+	waitKey(0);*/
       }
       exit(0);
       //c->draw(img);
@@ -165,7 +199,7 @@ int main(int argc, char* argv[])
   if (argc == 1)
     fluxWebcam(""); //webcam
   else if (argc == 2)
-    fluxWebcam(argv[1]);
+    ReadWebcam(argv[1]);
   else if (argc == 3 && strcmp(argv[1], "-i")==0)
     {
       Mat img;
@@ -173,6 +207,8 @@ int main(int argc, char* argv[])
       if (img.data)
 	{
 	  traitementImage(argv[2]);
+	//Comparaison avec les modeles via un surf
+	  	  //findObject(argv[2], 
 	  return 0;
 	} else {
 	return 1;
