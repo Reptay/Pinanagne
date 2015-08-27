@@ -1,7 +1,7 @@
 #include "surf.hh"
 
 
-void findObject(Mat sceneP, Mat objectP, int minHessian, Scalar color, Mat outImg)
+int findObject(Mat sceneP, Mat objectP, int minHessian, Scalar color, Mat outImg)
 {
 	//vector of keypoints	
 	vector<cv::KeyPoint> keypointsO;
@@ -67,7 +67,7 @@ void findObject(Mat sceneP, Mat objectP, int minHessian, Scalar color, Mat outIm
 
 	//-- Localize the object
 
-  if( good_matches.size() >=8 && good_matches.size() <= 30)
+ /* if( good_matches.size() >=8 && good_matches.size() <= 30)
   {
 	cout << "OBJECT FOUND!" << endl;
 	std::vector<Point2f> obj;
@@ -100,7 +100,7 @@ void findObject(Mat sceneP, Mat objectP, int minHessian, Scalar color, Mat outIm
 	line( outImg, scene_corners[3] , scene_corners[0] , color, 2 );
   }
   else cout << "OBJECT NOT FOUND!" << endl;
-	
+*/	
 	duration = static_cast<double>(cv::getTickCount())-duration;
 	duration = (duration/cv::getTickFrequency()) * 1000;
 	
@@ -117,5 +117,5 @@ void findObject(Mat sceneP, Mat objectP, int minHessian, Scalar color, Mat outIm
 	drawMatches(objectP, keypointsO, sceneP, keypointsS, good_matches, img_matches);
 	imshow("matches", img_matches);
 	waitKey(100);
-
+	return good_matches.size();
 }

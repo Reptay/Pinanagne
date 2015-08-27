@@ -12,6 +12,6 @@
 using namespace cv;
 using namespace std;
 
-void findObject(Mat sceneP, Mat objectP, int minHessian, Scalar color, Mat Outimg);
+int findObject(Mat sceneP, Mat objectP, int minHessian, Scalar color, Mat Outimg);
 
 #endif
