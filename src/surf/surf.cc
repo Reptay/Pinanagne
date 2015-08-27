@@ -50,6 +50,8 @@ void findObject(Mat sceneP, Mat objectP, int minHessian, Scalar color, Mat outIm
 
   vector< DMatch > good_matches;
 
+  cout << "Matches: " << matches.size() << endl;
+
   for(int i = 0; i < descriptors_object.rows; i++)
   {
 	  if( matches[i].distance < 3 * min_dist) 
