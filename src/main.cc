@@ -1,3 +1,4 @@
+#include <cmath>
 #include <string>
 #include "filter/filters.hh"
 #include "detection/shape.hh"
@@ -121,7 +122,7 @@ void traitementImage(char* path)
 			if (m != NULL)
 				panneaux.push_back(*m);
 		}
-		std::vector<int> matches();
+		std::vector<int> matches = std::vector<int>();
 		for (std::vector<Mat>::iterator it = panneaux.begin();
 				it != panneaux.end(); it++){
 			DIR* d;
@@ -142,13 +143,37 @@ void traitementImage(char* path)
 						Mat outImg = *it;
 						if (outImg.data)
 						{
-							findObject(*it, mod, 2500, Scalar(255,0,0), outImg);
+							int n = findObject(*it, mod, 2500, Scalar(255,0,0), outImg);
+							matches.push_back(n);
 							imshow("Test", outImg);
 							waitKey(0);
 						}
 					}
 				}
 			}
+			for (int i = 0; i < matches.size(); i++)
+			{
+				if (matches[i] >= 10 && matches[i] <= 25)
+				{
+					matches[i] = abs(matches[i] - 15);					
+}
+			}
+			int minpos = 0;
+			for (int i = 1; i < matches.size(); i++)
+			{
+				if (matches[i] < matches[minpos])
+					minpos = i;
+}
+int maxvit;
+switch(minpos)
+{
+	case 0: maxvit = 30;
+	case 1: maxvit = 50;
+	case 2: maxvit = 70;
+	case 3: maxvit = 90;
+	case 4: maxvit = 110;
+	default: maxvit = 130;
+}
 			//Mat mod = imread("./modeles/90km6.png");
 			//Mat dst = *it;
 			//Mat tmp = dst;
