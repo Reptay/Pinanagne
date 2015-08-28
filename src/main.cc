@@ -167,13 +167,14 @@ void traitementImage(char* path)
 int maxvit;
 switch(minpos)
 {
-	case 0: maxvit = 30;
-	case 1: maxvit = 50;
-	case 2: maxvit = 70;
-	case 3: maxvit = 90;
-	case 4: maxvit = 110;
-	default: maxvit = 130;
+	case 0: maxvit = 130; break;
+	case 1: maxvit = 90; break;
+	case 2: maxvit = 30; break;
+	case 3: maxvit = 70; break;
+	case 4: maxvit = 110; break;
+	default: maxvit = 50;
 }
+cout << "Vitesse maximale autorisée: " << maxvit << endl;
 			//Mat mod = imread("./modeles/90km6.png");
 			//Mat dst = *it;
 			//Mat tmp = dst;
