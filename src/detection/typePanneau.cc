@@ -2,7 +2,16 @@
 
 int getHauteur(Mat imgRed, int rayonFlou, int cx, int cy, int &minBande);
 int getLargeur(Mat imgRed, int rayonFlou, int cx, int cy, int &minBande);
-std::vector<int> nbCouleurContinu(Mat *img, int c);
+struct sForme {
+  int size;
+  int hauteur;
+  int largeur;
+  int minx;
+  int miny;
+  int maxx;
+  int maxy;
+};
+std::vector<sForme> nbCouleurContinu(Mat *img, int c);
 int min(int a, int b){
   if (a<b)
     return a;
@@ -89,31 +98,31 @@ Mat* isLimitation(Mat img, Circle* c)
       }
    imgBlack = BlackFilter(imgBlack);
 
-   std::vector<int> sizes = nbCouleurContinu(&imgBlack,255);
+   std::vector<sForme> formes = nbCouleurContinu(&imgBlack,255);
    // supprime les petites zones (bruit)
-   for (std::vector<int>::iterator it = sizes.begin(); it != sizes.end();){
-     if ((*it) < largeur*0.5){
+   for (std::vector<sForme>::iterator it = formes.begin(); it!=formes.end();){
+     if ((*it).size < largeur*0.5){
        std::cerr << " typePanneau.cc : rm forme continu " << 
-	 *it << " " <<largeur<<std::endl;
-       it = sizes.erase(it);
+	 (*it).size << " " <<largeur<<std::endl;
+       it = formes.erase(it);
      }
      else it++;
    }
-   if (sizes.size() <= 1 || sizes.size() > 3){
+   if (formes.size() <= 1 || formes.size() > 3){
      std::cerr << "typePanneau.cc Invalide nb de forme continu : " <<
-       sizes.size() << std::endl;
+       formes.size() << std::endl;
      return NULL;
    }
 
-   for (unsigned long i = 0; i < sizes.size()-1; i++)
-     for (unsigned long j = 1; j < sizes.size(); j++)
+   for (unsigned long i = 0; i < formes.size()-1; i++)
+     for (unsigned long j = 1; j < formes.size(); j++)
        {
 	 if (i == j)
 	   continue;
-	 double comp = compare(sizes[i], sizes[j]);
+	 double comp = compare(formes[i].size, formes[j].size);
 	 if (comp>2){
 	   std::cerr << "typePanneau.cc Proportions des chiffres invalides "
-		     << sizes[i] <<" "<<sizes[j]<< std::endl;
+		     << formes[i].size <<" "<<formes[j].size<< std::endl;
 	   return NULL;
 	 }
        }
@@ -267,7 +276,7 @@ int getLargeur(Mat imgRed, int rayonFlou, int cx, int cy, int &minBande){
 
 int detecteZone(Mat *img, int i, int j,int c, int size,
 		bool **visite);
-std::vector<int> nbCouleurContinu(Mat *img, int c)
+std::vector<sForme> nbCouleurContinu(Mat *img, int c)
 {
   bool** visite = new bool*[img->rows];
   for(int i = 0; i < img->rows; i++)
@@ -277,7 +286,7 @@ std::vector<int> nbCouleurContinu(Mat *img, int c)
       visite[i][j] = false;
     }
 
-  std::vector<int> sizes;
+  std::vector<sForme> formes;
  
   for (int i = 0; i < img->cols; i++)
     for (int j = 0; j < img->rows; j++)
@@ -285,7 +294,9 @@ std::vector<int> nbCouleurContinu(Mat *img, int c)
 	int pImg = (int)img->at<uchar>(j,i);
 	if (pImg == c && !visite[j][i])
 	  {
-	    sizes.push_back(detecteZone(img, i, j, c, 0, visite));
+	    sForme sf;
+	    sf.size = detecteZone(img, i, j, c, 0, visite);
+	    formes.push_back(sf);
 	  }
       }
 
@@ -295,7 +306,7 @@ std::vector<int> nbCouleurContinu(Mat *img, int c)
     }
   delete [] visite;
 
-  return sizes;
+  return formes;
 }
 
 /**
