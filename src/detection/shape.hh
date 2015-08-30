@@ -9,6 +9,7 @@
 #include <unistd.h>
 #include <vector>
 #include "circle.hh"
+#include "../filter/filters.hh"
 using namespace cv;
 using namespace std;
 

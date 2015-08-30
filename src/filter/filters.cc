@@ -33,6 +33,28 @@ Mat RedFilter(Mat img)
   return mask;
 }
 
+Mat RedFilterSouple(Mat img)
+{
+  Mat hsv = img.clone();
+  cvtColor(img, hsv, CV_BGR2HSV);
+
+  Mat mask1(img.size(), CV_8UC1);
+  Mat mask2(img.size(), CV_8UC1);
+
+  int sMin = 60;
+  int sMax = 255;
+  int vMin = 20;
+  int vMax = 255;
+  int hTol=20;
+
+  inRange(hsv, Scalar(0, sMin, vMin), Scalar(hTol, sMax, vMax), mask1);
+  inRange(hsv, Scalar(180-hTol, sMin, vMin), Scalar(180, sMax, vMax), mask2);
+
+  Mat mask = mask1+mask2;
+  //dp(mask);
+  return mask;
+}
+
 Mat BlackFilter(Mat img)
 {
   Mat hsv = img.clone();
@@ -44,7 +66,6 @@ Mat BlackFilter(Mat img)
   int sMax = 255;
   int vMin = 0;
   int vMax = 70; //50
-
 
   inRange(hsv, Scalar(0, sMin, vMin), Scalar(180, sMax, vMax), mask1);
   return mask1;
@@ -185,4 +206,17 @@ Point findcenter(Mat img, vector<vector<Point> >* ret)
 	int cx = m.m10/m.m00;
 	int cy = m.m01/m.m00;
 	return Point(cx, cy);
+}
+
+
+int nbWhitePix(Mat img){
+  int nb = 0;
+  for (int i = 0; i < img.cols; i++)
+    for (int j = 0; j < img.rows; j++)
+      {
+        int pImg = (int)img.at<uchar>(j,i);
+	if (pImg == 255)
+	  nb++;
+      }
+  return nb;
 }

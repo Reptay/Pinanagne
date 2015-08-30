@@ -19,6 +19,7 @@ double compare(int a, int b)
     return j / i;
 }
 
+
 Mat* isLimitation(Mat img, Circle* c)
 {
   if (c == NULL)
@@ -277,7 +278,6 @@ std::vector<int> nbCouleurContinu(Mat *img, int c)
     }
 
   std::vector<int> sizes;
-
  
   for (int i = 0; i < img->cols; i++)
     for (int j = 0; j < img->rows; j++)
@@ -334,28 +334,5 @@ int detecteZone(Mat *img, int i, int j, int c, int size,
       }
 
     }
-
-  /*
-  if (j+1 < img->rows && !visite[j+1][i]){
-    Point3_<uchar>* pImg2 = img->ptr<Point3_<uchar> >(j+1,i);
-    if (pImg2->x == b && pImg2->y == g && pImg2->z == r)
-      size = detecteZone(img, i, j+1, r, g, b, size, visite);
-  }
-  if (j-1 >= 0 && !visite[j-1][i]){
-    Point3_<uchar>* pImg2 = img->ptr<Point3_<uchar> >(j-1,i);
-    if (pImg2->x == b && pImg2->y == g && pImg2->z == r)
-      size = detecteZone(img, i, j-1, r, g, b, size, visite);
-  }
-  if (i+1 < img->cols && !visite[j][i+1]){
-    Point3_<uchar>* pImg2 = img->ptr<Point3_<uchar> >(j,i+1);
-    if (pImg2->x == b && pImg2->y == g && pImg2->z == r)
-      size = detecteZone(img, i+1, j, r, g, b, size, visite);
-  }
-  if (i-1 >= 0 && !visite[j][i-1]){
-    Point3_<uchar>* pImg2 = img->ptr<Point3_<uchar> >(j,i-1);
-    if (pImg2->x == b && pImg2->y == g && pImg2->z == r)
-      size = detecteZone(img, i-1, j, r, g, b, size, visite);
-  }
-  */
   return size;
 }

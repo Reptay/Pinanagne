@@ -6,24 +6,31 @@ using namespace std;
 
 std::vector<Circle*> getCircles(Mat img){
   std::vector<Circle*> vCircles;
-
+  double factorSize = 1;
   Mat img_gray;  
   //cvtColor(img, img_gray, CV_BGR2GRAY);
+  /*
   if(img.empty())
     return std::vector<Circle*>();
   else if(img.channels()>1)
     cvtColor(img, img_gray, CV_BGR2GRAY);
   else img_gray = img;
-
-
+  */
+  
+  img_gray = RedFilterSouple(img);
+  while (nbWhitePix(img_gray) > 30000){
+    factorSize /= 2;
+    resize(img_gray, img_gray, Size(), factorSize, factorSize, cv::INTER_LANCZOS4);
+  }
+  
   /// Reduce the noise so we avoid false circle detection
-  GaussianBlur(img_gray, img_gray, Size(3,3), 2, 2);
+  GaussianBlur(img_gray, img_gray, Size(9,9), 2, 2);
 
   vector<Vec3f> circles;
 
   /// Apply the Hough Transform to find the circles
   HoughCircles(img_gray, circles, CV_HOUGH_GRADIENT, 1.2,
-  	       img_gray.rows/8,170, 100, 0, 0 );
+  	       img_gray.rows/8,180, 100, 0, 0 );
   //                           ^^^ parametre important
 
   /// Draw the circles detected
@@ -37,8 +44,10 @@ std::vector<Circle*> getCircles(Mat img){
 
       // circle outline
       //  circle( img, center, radius, Scalar(0,0,255), 2, 8, 0 );
-
-      vCircles.push_back(new Circle(center, radius));
+      if (factorSize == 1)
+	vCircles.push_back(new Circle(center, radius));
+      else
+	vCircles.push_back(new Circle(center, radius, factorSize));
     }
   /*
   namedWindow("Display", WINDOW_AUTOSIZE);

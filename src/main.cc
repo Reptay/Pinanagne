@@ -33,10 +33,7 @@ void fluxWebcam(std::string path)
 		Mat img = cvarrToMat(image);
 		if (img.empty())
 			break;
-
-		double factor = 0.5;
-		resize(img, img, Size(), factor, factor, cv::INTER_LANCZOS4);
-
+		
 		std::vector<Circle*> circles = getCircles(img);
 		//    std::cerr << circles.size() << " ";
 
@@ -48,20 +45,17 @@ void fluxWebcam(std::string path)
 				panneaux.push_back(*m);
 				std::cerr <<std::endl<<
 					"----------------" <<"OK"<<"----------------" << std::endl;
+				(*it)->draw(img,0,255,0);
 			}
-			(*it)->draw(img);
-			/*
-			   namedWindow("Display2", WINDOW_AUTOSIZE);
-			   imshow("Display2", img);
-			   waitKey(0);
-			 */
+			else
+			  (*it)->draw(img);
 
 		}
 		for (std::vector<Mat>::iterator it = panneaux.begin();
 				it != panneaux.end(); it++){
 			namedWindow("Display", WINDOW_AUTOSIZE);
 			imshow("Display", *it);
-			waitKey(0);
+			//waitKey(0);
 			// RANSAC ICI, normalement il y a un panneau au maximum dans le vector
 		}
 
@@ -236,7 +230,8 @@ int main(int argc, char* argv[])
 	if (argc == 1)
 		fluxWebcam(""); //webcam
 	else if (argc == 2)
-		ReadWebcam(argv[1]);
+	  fluxWebcam(argv[1]);
+	  //ReadWebcam(argv[1]);
 	else if (argc == 3 && strcmp(argv[1], "-i")==0)
 	{
 		Mat img;
