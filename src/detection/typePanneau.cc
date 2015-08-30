@@ -120,13 +120,18 @@ Mat* isLimitation(Mat img, Circle* c)
 	 if (i == j)
 	   continue;
 	 double comp = compare(formes[i].size, formes[j].size);
-	 if (comp>2){
+	 double comp2 = compare(formes[i].hauteur, formes[j].hauteur);
+	 if (comp>2 || comp2 > 1.5){
 	   std::cerr << "typePanneau.cc Proportions des chiffres invalides "
 		     << formes[i].size <<" "<<formes[j].size<< std::endl;
 	   return NULL;
 	 }
        }
-
+   /*for (std::vector<sForme>::iterator it = formes.begin();
+	it!=formes.end();it++){
+     std::cout << "-> " << (*it).hauteur << " " << (*it).largeur <<
+       " " << hauteur << std::endl;
+       }*/
    return panneau;
 }
 
@@ -275,7 +280,7 @@ int getLargeur(Mat imgRed, int rayonFlou, int cx, int cy, int &minBande){
  */
 
 int detecteZone(Mat *img, int i, int j,int c, int size,
-		bool **visite);
+		bool **visite, struct sForme *sf);
 std::vector<sForme> nbCouleurContinu(Mat *img, int c)
 {
   bool** visite = new bool*[img->rows];
@@ -295,7 +300,10 @@ std::vector<sForme> nbCouleurContinu(Mat *img, int c)
 	if (pImg == c && !visite[j][i])
 	  {
 	    sForme sf;
-	    sf.size = detecteZone(img, i, j, c, 0, visite);
+	    sf.minx = i; sf.maxx = i; sf.miny = j; sf.maxy = j;
+	    sf.size = detecteZone(img, i, j, c, 0, visite, &sf);
+	    sf.largeur = sf.maxx - sf.minx;
+	    sf.hauteur = sf.maxy - sf.miny;
 	    formes.push_back(sf);
 	  }
       }
@@ -313,11 +321,20 @@ std::vector<sForme> nbCouleurContinu(Mat *img, int c)
  * explore une zone et retourne sa taille
  */
 int detecteZone(Mat *img, int i, int j, int c, int size,
-		bool **visite)
+		bool **visite, struct sForme *sf)
 {
   visite[j][i] = true;
   size++;
-
+  // i largeur
+  if (i < sf->minx)
+    sf->minx = i;
+  else if (i > sf->maxx)
+    sf->maxx = i;
+  if (j < sf->miny)
+    sf->miny = j;
+  else if (j > sf->maxy)
+    sf->maxy = j;
+  // j hauteur
   int rayonFlou = 2; // >= 1
   for (int x = rayonFlou*-1; x <= rayonFlou; x++)
     {
@@ -326,22 +343,22 @@ int detecteZone(Mat *img, int i, int j, int c, int size,
       if (j+x < img->rows && j+x>=0 && !visite[j+x][i]){
 	int pImg2 = (int)img->at<uchar>(j+x,i);
 	if (pImg2 == c)
-	  size = detecteZone(img, i, j+x, c, size, visite);
+	  size = detecteZone(img, i, j+x, c, size, visite, sf);
       }
       if (j-x >= 0 && j-x < img->rows && !visite[j-x][i]){
 	int pImg2 = (int)img->at<uchar>(j-x,i);
 	if (pImg2 == c)
-	  size = detecteZone(img, i, j-x, c, size, visite);
+	  size = detecteZone(img, i, j-x, c, size, visite, sf);
       }
       if (i+x < img->cols && i+x >= 0 &&!visite[j][i+x]){
 	int pImg2 = (int)img->at<uchar>(j,i+x);
 	if (pImg2 == c)
-	  size = detecteZone(img, i+x, j, c, size, visite);
+	  size = detecteZone(img, i+x, j, c, size, visite, sf);
       }
       if (i-x >= 0 && i-x<img->cols && !visite[j][i-x]){
 	int pImg2 = (int)img->at<uchar>(j,i-x);
 	if (pImg2 == c)
-	  size = detecteZone(img, i-x, j, c, size, visite);
+	  size = detecteZone(img, i-x, j, c, size, visite, sf);
       }
 
     }
