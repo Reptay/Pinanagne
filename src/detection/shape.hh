@@ -10,6 +10,8 @@
 #include <vector>
 #include "circle.hh"
 #include "../filter/filters.hh"
+#include "rectangle.hh"
+
 using namespace cv;
 using namespace std;
 
@@ -18,4 +20,5 @@ using namespace std;
  */
 std::vector<Circle*> getCircles(Mat img);
 
+std::vector<Circle*> getCirclesByEllipses(Mat src);
 #endif

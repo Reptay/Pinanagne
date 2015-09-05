@@ -21,8 +21,6 @@ void fluxWebcam(std::string path)
 		exit(1);
 	}
 
-
-
 	char key;
 	IplImage *image;
 	// cvNamedWindow("Webcam", CV_WINDOW_AUTOSIZE);
@@ -33,23 +31,23 @@ void fluxWebcam(std::string path)
 		Mat img = cvarrToMat(image);
 		if (img.empty())
 			break;
-		
-		std::vector<Circle*> circles = getCircles(img);
-		//    std::cerr << circles.size() << " ";
+
+		// std::vector<Circle*> circles = getCircles(img);
+		std::vector<Circle*> circles=getCirclesByEllipses(img.clone());
 
 		std::vector<Mat> panneaux;
 		for (std::vector<Circle*>::iterator it = circles.begin();
 				it != circles.end(); it++){
-			Mat* m = isLimitation(img, *it);
-			if (m != NULL){
-				panneaux.push_back(*m);
-				std::cerr <<std::endl<<
-					"----------------" <<"OK"<<"----------------" << std::endl;
-				(*it)->draw(img,0,255,0);
-			}
-			else
-			  (*it)->draw(img);
-
+		  Mat* m = isLimitation(img, *it);
+		  if (m != NULL){
+		    panneaux.push_back(*m);
+		    std::cerr <<std::endl<<
+		      "----------------" <<"OK"<<"----------------" << std::endl;
+		    (*it)->draw(img,0,255,0);
+		  }
+		  else
+		    (*it)->draw(img);
+		  
 		}
 		for (std::vector<Mat>::iterator it = panneaux.begin();
 				it != panneaux.end(); it++){
@@ -63,12 +61,10 @@ void fluxWebcam(std::string path)
 		cvShowImage( "Webcam", &image2);
 		// On attend 10ms
 		key = cvWaitKey(1);
-
 	}
 
 	cvReleaseCapture(&capture);
 	//cvDestroyWindow("Webcam");
-
 	exit(0);
 }
 
@@ -108,7 +104,7 @@ void traitementImage(char* path)
 	if (img.data)
 	{
 		/******* Detection d'un panneau de limitation *******/
-		std::vector<Circle*> circles = getCircles(img);
+		std::vector<Circle*> circles = getCirclesByEllipses(img);
 		std::vector<Mat> panneaux;
 		for (std::vector<Circle*>::iterator it = circles.begin();
 				it != circles.end(); it++){
