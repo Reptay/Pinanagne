@@ -1,5 +1,10 @@
 #include "circle.hh"
 
+double distEucl(Point a, Point b)
+{
+  return sqrt(pow(a.x-b.x,2)+pow(a.y-b.y,2));
+}
+
 Circle::Circle(Point center, float radius){
   this->center_ = center;
   this->radius_ = radius;
@@ -35,4 +40,13 @@ void Circle::draw(Mat img, int r, int g, int b){
 
   // circle outline
   circle( img, center_, radius_, Scalar(r,g,b), 2, 8, 0 );
+}
+
+bool Circle::isInside(Circle* c)
+{
+  double distCtr = distEucl(center_, c->getCenter());
+  if (distCtr + radius_ < c->getRadius())
+    return true;
+  else
+    return false;
 }

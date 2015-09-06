@@ -113,5 +113,24 @@ std::vector<Circle*> getCirclesByEllipses(Mat src)
       if (rects[i].isCircleProportion())
 	circles.push_back(rects[i].getCircle());
     }
+  
+  // Supprime les cercles dans d'autres cercles
+  for (std::vector<Circle*>::iterator it1 = circles.begin();
+       it1 != circles.end();){
+    bool brk = false;
+    for(std::vector<Circle*>::iterator it2 = circles.begin();
+	it2 != circles.end(); it2++){
+      if (it1 == it2 && it1 != circles.end())
+	continue;
+      if ((*it1)->isInside(*it2)){
+	it1 = circles.erase(it1);
+	brk = true;
+	break;
+      }
+    }
+    if (!brk)
+      it1++;
+  }
+  
   return circles;
 }

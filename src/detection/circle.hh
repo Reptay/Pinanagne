@@ -18,6 +18,7 @@ public:
   void draw(Mat img, int r, int g, int b);
   Point getCenter();
   float getRadius();
+  bool isInside(Circle* c);
 private:
   Point center_;
   float radius_;

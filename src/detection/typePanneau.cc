@@ -113,13 +113,14 @@ Mat* isLimitation(Mat img, Circle* c)
        formes.size() << std::endl;
      return NULL;
    }
+   
    for (unsigned long i = 0; i < formes.size(); i++)
-     if (compare(hauteur, formes[i].hauteur) > 1.5){
+     if (compare(hauteur, formes[i].hauteur) > 1.7){
        std::cerr << "typePanneau.cc Invalide Hauteur de forme continu : " <<
 	 formes[i].hauteur << std::endl;
        return NULL;
      }
-
+   
    for (unsigned long i = 0; i < formes.size()-1; i++)
      for (unsigned long j = 1; j < formes.size(); j++)
        {
