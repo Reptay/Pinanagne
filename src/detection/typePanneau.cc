@@ -1,5 +1,7 @@
 #include "typePanneau.hh"
 
+bool vrb = false; // Mode verbeux
+
 int getHauteur(Mat imgRed, int rayonFlou, int cx, int cy, int &minBande);
 int getLargeur(Mat imgRed, int rayonFlou, int cx, int cy, int &minBande);
 struct sForme {
@@ -44,7 +46,8 @@ Mat* isLimitation(Mat img, Circle* c)
   int minBande = 0;
   int hauteur =  getHauteur(imgRed, rayonFlou, cx, cy, minBande);
   if (hauteur == 0){
-    std::cerr << "hauteur == 0" << std::endl;
+    if (vrb)
+      std::cerr << "hauteur == 0" << std::endl;
     return NULL;
   }
   int largeur = getLargeur(imgRed, rayonFlou, cx, cy, minBande);
@@ -58,8 +61,9 @@ Mat* isLimitation(Mat img, Circle* c)
       2*largeur < r || 2*hauteur < r ||
       2*r < largeur || 2*r < hauteur)
     {
-      std::cerr<< "largeur ou hauteur non valide " << largeur
-	       << " " << hauteur<<std::endl;
+      if (vrb)
+	std::cerr<< "largeur ou hauteur non valide " << largeur
+		 << " " << hauteur<<std::endl;
       return NULL;
     }
 
@@ -102,22 +106,25 @@ Mat* isLimitation(Mat img, Circle* c)
    // supprime les petites zones (bruit)
    for (std::vector<sForme>::iterator it = formes.begin(); it!=formes.end();){
      if ((*it).size < largeur*0.5){
-       std::cerr << " typePanneau.cc : rm forme continu " << 
-	 (*it).size << " " <<largeur<<std::endl;
+       if(vrb)
+	 std::cerr << " typePanneau.cc : rm forme continu " << 
+	   (*it).size << " " <<largeur<<std::endl;
        it = formes.erase(it);
      }
      else it++;
    }
    if (formes.size() <= 1 || formes.size() > 3){
-     std::cerr << "typePanneau.cc Invalide nb de forme continu : " <<
-       formes.size() << std::endl;
+     if (vrb)
+       std::cerr << "typePanneau.cc Invalide nb de forme continu : " <<
+	 formes.size() << std::endl;
      return NULL;
    }
    
    for (unsigned long i = 0; i < formes.size(); i++)
      if (compare(hauteur, formes[i].hauteur) > 1.7){
-       std::cerr << "typePanneau.cc Invalide Hauteur de forme continu : " <<
-	 formes[i].hauteur << std::endl;
+       if (vrb)
+	 std::cerr << "typePanneau.cc Invalide Hauteur de forme continu : " <<
+	   formes[i].hauteur << std::endl;
        return NULL;
      }
    
@@ -129,8 +136,9 @@ Mat* isLimitation(Mat img, Circle* c)
 	 double comp = compare(formes[i].size, formes[j].size);
 	 double comp2 = compare(formes[i].hauteur, formes[j].hauteur);
 	 if (comp>2 || comp2 > 1.5){
-	   std::cerr << "typePanneau.cc Proportions des chiffres invalides "
-		     << formes[i].size <<" "<<formes[j].size<< std::endl;
+	   if (vrb)
+	     std::cerr << "typePanneau.cc Proportions des chiffres invalides "
+		       << formes[i].size <<" "<<formes[j].size<< std::endl;
 	   return NULL;
 	 }
        }
@@ -139,7 +147,8 @@ Mat* isLimitation(Mat img, Circle* c)
      std::cout << "-> " << (*it).hauteur << " " << (*it).largeur <<
        " " << hauteur << std::endl;
        }*/
-   std::cout << "---> " << hauteur*2 << " "<<formes[0].hauteur << std::endl;
+   if (vrb)
+     std::cout << "---> " << hauteur*2 << " "<<formes[0].hauteur << std::endl;
    return panneau;
 }
 
@@ -193,18 +202,22 @@ int getHauteur(Mat imgRed, int rayonFlou, int cx, int cy, int &minBande){
       }
     }
   if (bandeBas == 0 || bandeHaut == 0){
-    std::cerr << "Bande haut ou bas = 0" << std::endl;
+    if (vrb)
+      std::cerr << "Bande haut ou bas = 0" << std::endl;
     return 0;
   }
   if (bandeBas*2 < bandeHaut || bandeHaut*2 < bandeBas){
-    std::cout << "Bande haut et bande bas disproportionné, typePanneau.cc"
-	      <<std::endl;
+    if (vrb)
+      std::cout << "Bande haut et bande bas disproportionné, typePanneau.cc "<<
+	bandeHaut << " " << bandeBas <<std::endl;
     return 0;
   }
-  if (hauteur / bandeBas < 3 || hauteur / bandeBas > 7 ||
-      hauteur / bandeHaut < 3 || hauteur / bandeHaut > 7){
-    std::cout <<
-      "Hauteur disproportionné par rapport au contour, typePanneau.cc"<<
+  if (hauteur / bandeBas < 1.5 || hauteur / bandeBas > 7 ||
+      hauteur / bandeHaut < 1.5 || hauteur / bandeHaut > 7){
+    if (vrb)
+      std::cout <<
+	"Hauteur disproportionné par rapport au contour, typePanneau.cc "<<
+	hauteur << " " << bandeBas << " " << bandeHaut <<
       std::endl;
     return 0;
   }
@@ -260,19 +273,22 @@ int getLargeur(Mat imgRed, int rayonFlou, int cx, int cy, int &minBande){
     }
 
   if (bandeDroite == 0 || bandeGauche == 0){
-    std::cerr << "Bande gauche ou droite = 0"<<std::endl;
+    if (vrb)
+      std::cerr << "Bande gauche ou droite = 0"<<std::endl;
     return 0;
   }
   if (bandeDroite*2 < bandeGauche || bandeGauche*2 < bandeDroite){
-    std::cout << "Bande gauche et bande droite disproportionné, typePanneau.cc"
-              <<std::endl;
+    if (vrb)
+      std::cout<<"Bande gauche et bande droite disproportionné, typePanneau.cc"
+		<<std::endl;
     return 0;
   }
-  if (largeur / bandeDroite < 3 || largeur / bandeDroite > 10 ||
-      largeur / bandeGauche < 3 || largeur / bandeGauche > 10){
-    std::cout <<
-      "largeur disproportionné par rapport au contour, typePanneau.cc "<<
-      largeur << " " << bandeGauche<< " " << bandeDroite <<  std::endl;
+  if (largeur / bandeDroite < 1.5 || largeur / bandeDroite > 10 ||
+      largeur / bandeGauche < 1.5 || largeur / bandeGauche > 10){
+    if (vrb)
+      std::cout <<
+	"largeur disproportionné par rapport au contour, typePanneau.cc "<<
+	largeur << " " << bandeGauche<< " " << bandeDroite <<  std::endl;
     return 0;
   }
   if (bandeGauche < minBande)
@@ -321,7 +337,6 @@ std::vector<sForme> nbCouleurContinu(Mat *img, int c)
       delete [] visite[i];
     }
   delete [] visite;
-
   return formes;
 }
 
