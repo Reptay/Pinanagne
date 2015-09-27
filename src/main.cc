@@ -126,6 +126,7 @@ void traitementImage(char* path)
 		for (std::vector<Mat>::iterator it = panneaux.begin();
 				it != panneaux.end(); it++){
 			DIR* d;
+							cvtColor(*it, *it, CV_BGR2GRAY);
 			d = opendir("./modeles");
 			if (!d)
 				return;
@@ -143,7 +144,8 @@ void traitementImage(char* path)
 						Mat outImg = *it;
 						if (outImg.data)
 						{
-							int n = findObject(*it, mod, 2500, Scalar(255,0,0), outImg);
+							cvtColor(mod, mod, CV_BGR2GRAY);
+							int n = findObject(*it, mod, 500, Scalar(255,0,0), outImg);
 							matches.push_back(n);
 							imshow("Test", outImg);
 							waitKey(0);
