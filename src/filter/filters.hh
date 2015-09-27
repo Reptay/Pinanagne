@@ -16,7 +16,7 @@ void dp(Mat img);
 void dp(Mat img, std::string str);
 Mat RedFilter(Mat img);
 Mat RedFilterSouple(Mat img);
-void BlueFilter(Mat img);
+Mat BlueFilter(Mat img);
 void BlueRedFilter(Mat img);
 Mat BlackFilter(Mat img);
 void getContour(Mat& img);

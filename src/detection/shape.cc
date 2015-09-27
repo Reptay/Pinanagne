@@ -134,3 +134,16 @@ std::vector<Circle*> getCirclesByEllipses(Mat src)
   
   return circles;
 }
+
+bool isCity(Mat img)
+{
+Mat red = RedFilter(img);
+return detectRect(red).size() > 0;
+detectRect(red);
+}
+
+vector<Rect> BlueSquareSign(Mat img)
+{
+Mat blue = BlueFilter(img);
+return detectRect(blue);
+}

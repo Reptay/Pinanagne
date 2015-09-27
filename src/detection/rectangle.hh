@@ -24,4 +24,6 @@ private:
   int width_;
 };
 
+vector<Rect> detectRect(Mat img); 
+
 #endif
