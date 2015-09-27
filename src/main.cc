@@ -10,72 +10,62 @@
 
 void fluxWebcam(std::string path)
 {
-	//  path = "";
-	CvCapture *capture;
-	if (path.empty()) // pas testé pour la webcam
-		capture = cvCreateCameraCapture( CV_CAP_ANY );
-	else
-		capture = cvCreateFileCapture(path.c_str());
-	if (!capture) {
-		printf("Ouverture du flux vidéo impossible !\n");
-		exit(1);
-	}
-
-
-
-	char key;
-	IplImage *image;
-	// cvNamedWindow("Webcam", CV_WINDOW_AUTOSIZE);
-	// Boucle tant que l'utilisateur n'appuie pas sur la touche q (ou Q)
-	while(key != 'q' && key != 'Q') {
-		// On récupère une image
-		image = cvQueryFrame(capture);
-		Mat img = cvarrToMat(image);
-		if (img.empty())
-			break;
-
-		double factor = 0.5;
-		resize(img, img, Size(), factor, factor, cv::INTER_LANCZOS4);
-
-		std::vector<Circle*> circles = getCircles(img);
-		//    std::cerr << circles.size() << " ";
-
-		std::vector<Mat> panneaux;
-		for (std::vector<Circle*>::iterator it = circles.begin();
-				it != circles.end(); it++){
-			Mat* m = isLimitation(img, *it);
-			if (m != NULL){
-				panneaux.push_back(*m);
-				std::cerr <<std::endl<<
-					"----------------" <<"OK"<<"----------------" << std::endl;
-			}
-			(*it)->draw(img);
-			/*
-			   namedWindow("Display2", WINDOW_AUTOSIZE);
-			   imshow("Display2", img);
-			   waitKey(0);
-			 */
-
-		}
-		for (std::vector<Mat>::iterator it = panneaux.begin();
-				it != panneaux.end(); it++){
-			namedWindow("Display", WINDOW_AUTOSIZE);
-			imshow("Display", *it);
-			waitKey(0);
-			// RANSAC ICI, normalement il y a un panneau au maximum dans le vector
-		}
-
-		IplImage image2=img;
-		cvShowImage( "Webcam", &image2);
-		// On attend 10ms
-		key = cvWaitKey(1);
-
-	}
-
-	cvReleaseCapture(&capture);
-	//cvDestroyWindow("Webcam");
-
-	exit(0);
+  //  path = "";
+  CvCapture *capture;
+  if (path.empty()) // pas testé pour la webcam
+    capture = cvCreateCameraCapture( CV_CAP_ANY );
+  else
+    capture = cvCreateFileCapture(path.c_str());
+  if (!capture) {
+    printf("Ouverture du flux vidéo impossible !\n");
+    exit(1);
+  }
+  
+  char key;
+  IplImage *image;
+  // cvNamedWindow("Webcam", CV_WINDOW_AUTOSIZE);
+  // Boucle tant que l'utilisateur n'appuie pas sur la touche q (ou Q)
+  while(key != 'q' && key != 'Q') {
+    // On récupère une image
+    image = cvQueryFrame(capture);
+    Mat img = cvarrToMat(image);
+    if (img.empty())
+      break;
+    
+    // std::vector<Circle*> circles = getCircles(img);
+    std::vector<Circle*> circles=getCirclesByEllipses(img.clone());
+    
+    std::vector<Mat> panneaux;
+    for (std::vector<Circle*>::iterator it = circles.begin();
+	 it != circles.end(); it++){
+      Mat* m = isLimitation(img, *it);
+      if (m != NULL){
+	panneaux.push_back(*m);
+	std::cerr <<std::endl<<
+	  "----------------" <<"OK"<<"----------------" << std::endl;
+	(*it)->draw(img,0,255,0);
+      }
+      else
+	(*it)->draw(img);
+      
+    }
+    for (std::vector<Mat>::iterator it = panneaux.begin();
+	 it != panneaux.end(); it++){
+      namedWindow("Display", WINDOW_AUTOSIZE);
+      imshow("Display", *it);
+      //waitKey(0);
+      // RANSAC ICI, normalement il y a un panneau au maximum dans le vector
+    }
+    
+    IplImage image2=img;
+    cvShowImage( "Webcam", &image2);
+    // On attend 10ms
+    key = cvWaitKey(1);
+  }
+  
+  cvReleaseCapture(&capture);
+  //cvDestroyWindow("Webcam");
+  exit(0);
 }
 
 void ReadWebcam(char* path)
@@ -114,7 +104,7 @@ void traitementImage(char* path)
 	if (img.data)
 	{
 		/******* Detection d'un panneau de limitation *******/
-		std::vector<Circle*> circles = getCircles(img);
+		std::vector<Circle*> circles = getCirclesByEllipses(img);
 		std::vector<Mat> panneaux;
 		for (std::vector<Circle*>::iterator it = circles.begin();
 				it != circles.end(); it++){
@@ -238,7 +228,8 @@ int main(int argc, char* argv[])
 	if (argc == 1)
 		fluxWebcam(""); //webcam
 	else if (argc == 2)
-		ReadWebcam(argv[1]);
+	  fluxWebcam(argv[1]);
+	  //ReadWebcam(argv[1]);
 	else if (argc == 3 && strcmp(argv[1], "-i")==0)
 	{
 		Mat img;

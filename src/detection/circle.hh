@@ -13,9 +13,12 @@ class Circle
 {
 public:
   Circle(Point center, float radius);
+  Circle(Point center, float radius, double factorSize);
   void draw(Mat img);
+  void draw(Mat img, int r, int g, int b);
   Point getCenter();
   float getRadius();
+  bool isInside(Circle* c);
 private:
   Point center_;
   float radius_;
