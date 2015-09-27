@@ -4,6 +4,7 @@ bool vrb = false; // Mode verbeux
 
 int getHauteur(Mat imgRed, int rayonFlou, int cx, int cy, int &minBande);
 int getLargeur(Mat imgRed, int rayonFlou, int cx, int cy, int &minBande);
+void supprimeFond(Mat *img, Circle* c);
 struct sForme {
   int size;
   int hauteur;
@@ -98,7 +99,6 @@ Mat* isLimitation(Mat img, Circle* c)
 	    pImg->y = 255;
 	    pImg->z = 255;
 	  }
-
       }
    imgBlack = BlackFilter(imgBlack);
 
@@ -149,6 +149,8 @@ Mat* isLimitation(Mat img, Circle* c)
        }*/
    if (vrb)
      std::cout << "---> " << hauteur*2 << " "<<formes[0].hauteur << std::endl;
+
+   supprimeFond(panneau, c2);
    return panneau;
 }
 
@@ -386,4 +388,21 @@ int detecteZone(Mat *img, int i, int j, int c, int size,
 
     }
   return size;
+}
+
+void supprimeFond(Mat *img, Circle* c)
+{
+  for (int i = 0; i < img->cols; i++)
+    for (int j = 0; j < img->rows; j++)
+      {
+	Point3_<uchar>* pImg = img->ptr<Point3_<uchar> >(j,i);
+	int distCentre = sqrt(pow((j - c->getCenter().x), 2) +
+			      pow((i - c->getCenter().y), 2));
+	if (distCentre >= c->getRadius())
+	  {
+	    pImg->x = 255;
+	    pImg->y = 255;
+	    pImg->z = 255;
+	  }
+      }
 }
