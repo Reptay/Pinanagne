@@ -17,7 +17,7 @@ int findObject(Mat sceneP, Mat objectP, int minHessian, Scalar color, Mat outImg
 	surf.detect(objectP,keypointsO);
 	surf.detect(sceneP,keypointsS);
 */
-	SIFT sift(50,5);
+	SIFT sift(10,1);
 	Mat detector;
 	sift(objectP, Mat(), keypointsO, detector);
 	sift(sceneP, Mat(), keypointsS, detector);
@@ -33,9 +33,8 @@ int findObject(Mat sceneP, Mat objectP, int minHessian, Scalar color, Mat outImg
  
 
   //-- Step 3: Matching descriptor vectors using FLANN matcher
- // FlannBasedMatcher matcher;  
-  //BFMatcher matcher(NORM_L1);
-	BruteForceMatcher<L2<float>> matcher;
+  FlannBasedMatcher matcher;  
+  //BFMatcher matcher(NORM_L2);
   std::vector< DMatch > matches;
   matcher.match( descriptors_object, descriptors_scene, matches );
 
@@ -43,13 +42,13 @@ int findObject(Mat sceneP, Mat objectP, int minHessian, Scalar color, Mat outImg
   double dist;
 
   //Quick calculation of min and max distances between keypoints
-  /*for(int i=0; i<descriptors_object.rows; i++)
+  for(int i=0; i<descriptors_object.rows; i++)
   {
 	dist = matches[i].distance;
 	if( dist < min_dist ) min_dist = dist;
 	if( dist > max_dist ) max_dist = dist;
   }
-*/
+
  /* cout << "-- Max Dist: " << max_dist << endl;
   cout << "-- Min Dist: " << min_dist << endl;*/
 
@@ -57,11 +56,11 @@ int findObject(Mat sceneP, Mat objectP, int minHessian, Scalar color, Mat outImg
 
   cout << "Matches: " << matches.size() << endl;
 
- /* for(int i = 0; i < descriptors_object.rows; i++)
+  for(int i = 0; i < descriptors_object.rows; i++)
   {
-	  if( matches[i].distance < 3 * min_dist) 
+	  if( matches[i].distance < 300) 
 		  good_matches.push_back( matches[i] );
-  }*/
+  }
 
 	//drawMatches(objectP,keypointsO,sceneP,keypointsS,matches,outImg,Scalar::all(-1), Scalar::all(-1),vector<char>(),DrawMatchesFlags::NOT_DRAW_SINGLE_POINTS);
 
@@ -112,14 +111,14 @@ int findObject(Mat sceneP, Mat objectP, int minHessian, Scalar color, Mat outImg
 	
 	 
 	//cout <<  << endl;
-//	cout << "Good matches found: " << good_matches.size() << endl;
+	cout << "Good matches found: " << good_matches.size() << endl;
 	cout << "Algorithm duration: " << duration << endl << "--------------------------------------" << endl;
 
 
 	// drawing the results
 	namedWindow("matches");
 	Mat img_matches;
-	drawMatches(objectP, keypointsO, sceneP, keypointsS, matches, img_matches);
+	drawMatches(objectP, keypointsO, sceneP, keypointsS, good_matches, img_matches);
 	imwrite("show.jpg", img_matches);
 	imshow("matches", img_matches);
 	waitKey(100);

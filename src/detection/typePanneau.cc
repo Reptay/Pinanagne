@@ -388,4 +388,7 @@ int detecteZone(Mat *img, int i, int j, int c, int size,
   return size;
 }
 
+int checkRect(Mat img)
+{
 
+}
