@@ -6,6 +6,7 @@
 #include "ransac/ransac.hh"
 #include "audio/audio.hh"
 #include "surf/surf.hh"
+#include "detection/detectRect.hh"
 #include <dirent.h>
 
 void fluxWebcam(std::string path)
@@ -98,11 +99,16 @@ void ReadWebcam(int device)
 
 void traitementImage(char* path)
 {
+	int vitzone = 90;
 	Mat img;
 	img = imread(path, CV_LOAD_IMAGE_COLOR);
 
 	if (img.data)
 	{
+		if (isCity(img))
+			vitzone = 50;
+		else if (isHighWay(img))
+			vitzone = 130;	
 		/******* Detection d'un panneau de limitation *******/
 		std::vector<Circle*> circles = getCirclesByEllipses(img);
 		std::vector<Mat> panneaux;
