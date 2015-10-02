@@ -16,5 +16,5 @@ vector<Rect> detectRect(Mat img);
 
 bool isCity(Mat img);
 bool isHighWay(Mat img);
-
+bool endCity(Mat img);
 #endif

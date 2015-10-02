@@ -99,16 +99,19 @@ void ReadWebcam(int device)
 
 void traitementImage(char* path)
 {
-	int vitzone = 90;
+	int vitzone = 50;
 	Mat img;
 	img = imread(path, CV_LOAD_IMAGE_COLOR);
 
 	if (img.data)
 	{
-		if (isCity(img))
+		if (vitzone == 90 && isCity(img))
 			vitzone = 50;
-		else if (isHighWay(img))
-			vitzone = 130;	
+		else if (vitzone == 90 && isHighWay(img))
+			vitzone = 130;
+		else if (vitzone == 50 && endCity(img))
+			vitzone = 90;
+cout << "Vitesse maximale dans cette zone: " << vitzone << endl;
 		/******* Detection d'un panneau de limitation *******/
 		std::vector<Circle*> circles = getCirclesByEllipses(img);
 		std::vector<Mat> panneaux;

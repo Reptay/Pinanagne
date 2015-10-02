@@ -273,3 +273,12 @@ int nbWhitePix(Mat img){
 		}
 	return nb;
 }
+
+Mat onlyBlack(Mat img)
+{
+	Mat hsv = img.clone();
+	cvtColor(img, hsv, CV_BGR2HSV);
+	Mat mask(img.size(), CV_8UC1);
+inRange(hsv, Scalar(0,0,0), Scalar(180,255,0), mask);
+return mask;
+}

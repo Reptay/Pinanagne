@@ -1,6 +1,6 @@
 BBBBBCXX=g++
 CXXFLAGS= -std=c++11 -g3 -pthread
-FILES=src/main.cc src/filter/filters.cc src/detection/shape.cc src/detection/circle.cc src/ransac/ransac.cc src/detection/typePanneau.cc src/audio/audio.cc src/surf/surf.cc src/detection/rectangle.cc
+FILES=src/main.cc src/filter/filters.cc src/detection/shape.cc src/detection/circle.cc src/ransac/ransac.cc src/detection/typePanneau.cc src/audio/audio.cc src/surf/surf.cc src/detection/rectangle.cc src/detection/detectRect.cc
 OBJ=$(FILES:.cc=.o)
 TARGET=pinanagne
 

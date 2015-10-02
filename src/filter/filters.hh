@@ -23,4 +23,5 @@ void getContour(Mat& img);
 void getOrientation(Mat& img);
 Point findcenter(Mat img, vector<vector<Point> >* ret);
 int nbWhitePix(Mat img);
+Mat onlyBlack(Mat img);
 #endif /*FILTERS_HH*/

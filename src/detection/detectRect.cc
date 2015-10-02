@@ -53,7 +53,22 @@ Mat interimg = Mat (img, rects[i]);
 Mat label = imread("./modeles/autoroute.jpg");
 Mat outimg = img;
 int n = findObject(interimg, label, 500, Scalar(255,0,0), outimg);
+waitKey();
 if (n > 0)
+return true;
+}
+return false;
+}
+
+bool endCity(Mat img)
+{
+Mat black = BlackFilter(img);
+vector<Rect> rects = detectRect(black);
+for (int i = 0; i < rects.size(); i++)
+{
+Mat interimg = Mat(img, rects[i]);
+Mat red = RedFilter(interimg);
+if (nbWhitePix(red) > 0)
 return true;
 }
 return false;
