@@ -405,6 +405,7 @@ void supprimeFond(Mat *img, Circle* c)
 	    pImg->z = 255;
 	  }
       }
+}
 
 int checkRect(Mat img)
 {
