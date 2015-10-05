@@ -64,3 +64,5 @@ Circle* Rectangle::getCircle(){
   int radius = (int) coteMax/2;
   return new Circle(Point(cx,cy),radius);
 }
+
+

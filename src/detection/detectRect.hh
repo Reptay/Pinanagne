@@ -1,5 +1,5 @@
-#ifndef SHAPE_HH
-#define SHAPE_HH
+#ifndef DETECTRECT_HH
+#define DETECTRECT_HH
 
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
@@ -7,19 +7,14 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <stdlib.h>
 #include <unistd.h>
-#include <vector>
-#include "circle.hh"
 #include "../filter/filters.hh"
-#include "rectangle.hh"
-
+#include "../surf/surf.hh"
 using namespace cv;
 using namespace std;
 
-/**
- * Detecte tous les ronds dans l'images
- */
-std::vector<Circle*> getCircles(Mat img);
+vector<Rect> detectRect(Mat img); 
 
-std::vector<Circle*> getCirclesByEllipses(Mat src);
-
+bool isCity(Mat img);
+bool isHighWay(Mat img);
+bool endCity(Mat img);
 #endif

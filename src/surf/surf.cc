@@ -1,5 +1,5 @@
 #include "surf.hh"
-
+#include "opencv2/legacy/legacy.hpp"
 
 int findObject(Mat sceneP, Mat objectP, int minHessian, Scalar color, Mat outImg)
 {
@@ -13,14 +13,18 @@ int findObject(Mat sceneP, Mat objectP, int minHessian, Scalar color, Mat outImg
 
 
 
-	SurfFeatureDetector surf(minHessian);
+	/*SiftFeatureDetector surf;
 	surf.detect(objectP,keypointsO);
 	surf.detect(sceneP,keypointsS);
-
+*/
+	SIFT sift(10,1);
+	Mat detector;
+	sift(objectP, Mat(), keypointsO, detector);
+	sift(sceneP, Mat(), keypointsS, detector);
 
 	//-- Step 2: Calculate descriptors (feature vectors)
-  SurfDescriptorExtractor extractor;
-
+  //SurfDescriptorExtractor extractor;
+	SiftDescriptorExtractor extractor;
   Mat descriptors_object, descriptors_scene;
 
   extractor.compute( objectP, keypointsO, descriptors_object );
@@ -30,7 +34,7 @@ int findObject(Mat sceneP, Mat objectP, int minHessian, Scalar color, Mat outImg
 
   //-- Step 3: Matching descriptor vectors using FLANN matcher
   FlannBasedMatcher matcher;  
-  //BFMatcher matcher(NORM_L1);
+  //BFMatcher matcher(NORM_L2);
   std::vector< DMatch > matches;
   matcher.match( descriptors_object, descriptors_scene, matches );
 
@@ -54,7 +58,7 @@ int findObject(Mat sceneP, Mat objectP, int minHessian, Scalar color, Mat outImg
 
   for(int i = 0; i < descriptors_object.rows; i++)
   {
-	  if( matches[i].distance < 3 * min_dist) 
+	  if( matches[i].distance < 300) 
 		  good_matches.push_back( matches[i] );
   }
 
@@ -115,7 +119,8 @@ int findObject(Mat sceneP, Mat objectP, int minHessian, Scalar color, Mat outImg
 	namedWindow("matches");
 	Mat img_matches;
 	drawMatches(objectP, keypointsO, sceneP, keypointsS, good_matches, img_matches);
+	imwrite("show.jpg", img_matches);
 	imshow("matches", img_matches);
 	waitKey(100);
-	return good_matches.size();
+	return matches.size();
 }

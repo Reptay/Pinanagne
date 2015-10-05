@@ -6,6 +6,7 @@
 #include "ransac/ransac.hh"
 #include "audio/audio.hh"
 #include "surf/surf.hh"
+#include "detection/detectRect.hh"
 #include <dirent.h>
 
 void fluxWebcam(std::string path)
@@ -98,11 +99,19 @@ void ReadWebcam(int device)
 
 void traitementImage(char* path)
 {
+	int vitzone = 50;
 	Mat img;
 	img = imread(path, CV_LOAD_IMAGE_COLOR);
 
 	if (img.data)
 	{
+		if (vitzone == 90 && isCity(img))
+			vitzone = 50;
+		else if (vitzone == 90 && isHighWay(img))
+			vitzone = 130;
+		else if (vitzone == 50 && endCity(img))
+			vitzone = 90;
+cout << "Vitesse maximale dans cette zone: " << vitzone << endl;
 		/******* Detection d'un panneau de limitation *******/
 		std::vector<Circle*> circles = getCirclesByEllipses(img);
 		std::vector<Mat> panneaux;
@@ -116,6 +125,7 @@ void traitementImage(char* path)
 		for (std::vector<Mat>::iterator it = panneaux.begin();
 				it != panneaux.end(); it++){
 			DIR* d;
+							cvtColor(*it, *it, CV_BGR2GRAY);
 			d = opendir("./modeles");
 			if (!d)
 				return;
@@ -133,7 +143,8 @@ void traitementImage(char* path)
 						Mat outImg = *it;
 						if (outImg.data)
 						{
-							int n = findObject(*it, mod, 2500, Scalar(255,0,0), outImg);
+							cvtColor(mod, mod, CV_BGR2GRAY);
+							int n = findObject(*it, mod, 500, Scalar(255,0,0), outImg);
 							matches.push_back(n);
 							imshow("Test", outImg);
 							waitKey(0);
