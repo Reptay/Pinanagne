@@ -51,7 +51,7 @@ void Rectangle::draw(Mat img)
 
 bool Rectangle::isCircleProportion()
 {
-  if (comparerc(width_, height_) < 1.02 &&
+  if (comparerc(width_, height_) < 1.06 &&
       width_ > 20)
     return true;
   else
@@ -65,4 +65,11 @@ Circle* Rectangle::getCircle(){
   return new Circle(Point(cx,cy),radius);
 }
 
-
+Circle* Rectangle::getCircle(double factorSize)
+{
+  int cx = x_ + ((int) width_/2);
+  int cy = y_+ ((int) height_/2);
+  int coteMax = max(width_, height_);
+  int radius = (int) coteMax/2;
+  return new Circle(Point(cx,cy),radius, factorSize);
+}

@@ -17,6 +17,7 @@ public:
   void draw(Mat img);
   bool isCircleProportion();
   Circle* getCircle();
+  Circle* getCircle(double factorSize);
 private:
   int x_; // point en haut a gauche
   int y_;

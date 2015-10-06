@@ -1,6 +1,6 @@
 #include "typePanneau.hh"
 
-bool vrb = false; // Mode verbeux
+bool vrb = true; // Mode verbeux
 
 int getHauteur(Mat imgRed, int rayonFlou, int cx, int cy, int &minBande);
 int getLargeur(Mat imgRed, int rayonFlou, int cx, int cy, int &minBande);
@@ -121,10 +121,10 @@ Mat* isLimitation(Mat img, Circle* c)
    }
    
    for (unsigned long i = 0; i < formes.size(); i++)
-     if (compare(hauteur, formes[i].hauteur) > 1.7){
+     if (compare(hauteur, formes[i].hauteur) > 2.3){
        if (vrb)
 	 std::cerr << "typePanneau.cc Invalide Hauteur de forme continu : " <<
-	   formes[i].hauteur << std::endl;
+	   compare(hauteur, formes[i].hauteur) << std::endl;
        return NULL;
      }
    

@@ -62,6 +62,10 @@ std::vector<Circle*> getCirclesByEllipses(Mat src)
   RNG rng(12345);
   std::vector<Rectangle> rects;
 
+  double factorSize = 0.5;
+  resize(src, src, Size(), factorSize, factorSize, cv::INTER_LANCZOS4);
+
+
   Mat src_gray;
   src_gray = RedFilterSouple(src);
   blur( src_gray, src_gray, Size(3,3) );
@@ -92,9 +96,9 @@ std::vector<Circle*> getCirclesByEllipses(Mat src)
     {
       Scalar color = Scalar( rng.uniform(0, 255), rng.uniform(0,255), rng.uniform(0,255) );
       // contour
-      //      drawContours( drawing, contours, i, color, 1, 8, vector<Vec4i>(), 0, Point() );
+      //  drawContours( drawing, contours, i, color, 1, 8, vector<Vec4i>(), 0, Point() );
       // ellipse
-      //ellipse( drawing, minEllipse[i], color, 2, 8 );
+      //      ellipse( drawing, minEllipse[i], color, 2, 8 );
       // rotated rectangle
       Point2f rect_points[4]; minRect[i].points( rect_points );
       Rectangle r(rect_points);
@@ -102,7 +106,7 @@ std::vector<Circle*> getCirclesByEllipses(Mat src)
     }
 
   /// Show in a window
-  /*  
+  /*
   namedWindow( "Contours", CV_WINDOW_AUTOSIZE );
   imshow( "Contours", drawing );
   waitKey(0);
@@ -111,7 +115,7 @@ std::vector<Circle*> getCirclesByEllipses(Mat src)
   for (int i = 0; i < rects.size(); i++)
     {
       if (rects[i].isCircleProportion())
-	circles.push_back(rects[i].getCircle());
+	circles.push_back(rects[i].getCircle(factorSize));
     }
   
   // Supprime les cercles dans d'autres cercles
@@ -131,7 +135,7 @@ std::vector<Circle*> getCirclesByEllipses(Mat src)
     if (!brk)
       it1++;
   }
-  
+
   return circles;
 }
 
