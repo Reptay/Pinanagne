@@ -1,4 +1,5 @@
 #include "surf.hh"
+
 #include "opencv2/legacy/legacy.hpp"
 
 int findObject(Mat sceneP, Mat objectP, int minHessian, Scalar color, Mat outImg)
@@ -122,5 +123,5 @@ int findObject(Mat sceneP, Mat objectP, int minHessian, Scalar color, Mat outImg
 	imwrite("show.jpg", img_matches);
 	imshow("matches", img_matches);
 	waitKey(100);
-	return matches.size();
+	return good_matches.size();
 }

@@ -140,7 +140,7 @@ Mat BlueFilter(Mat img)
 
 	Mat mask(img.size(), CV_8UC1);
 
-	inRange(hsv, Scalar(110, 50, 50), Scalar(130, 255, 255), mask);
+	inRange(hsv, Scalar(100, 50, 50), Scalar(130, 255, 255), mask);
 	return mask;
 }
 

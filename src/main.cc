@@ -99,7 +99,7 @@ void ReadWebcam(int device)
 
 void traitementImage(char* path)
 {
-	int vitzone = 50;
+	int vitzone = 90;
 	Mat img;
 	img = imread(path, CV_LOAD_IMAGE_COLOR);
 
@@ -126,13 +126,13 @@ cout << "Vitesse maximale dans cette zone: " << vitzone << endl;
 				it != panneaux.end(); it++){
 			DIR* d;
 							cvtColor(*it, *it, CV_BGR2GRAY);
-			d = opendir("./modeles");
+			d = opendir("./modeles/vitesse");
 			if (!d)
 				return;
 			struct dirent* f;
 			while ((f = readdir(d)))
 			{
-				string st = "./modeles/";
+				string st = "./modeles/vitesse/";
 				if (f->d_name[0] != '.')
 				{
 					st += f->d_name;
@@ -146,25 +146,20 @@ cout << "Vitesse maximale dans cette zone: " << vitzone << endl;
 							cvtColor(mod, mod, CV_BGR2GRAY);
 							int n = findObject(*it, mod, 500, Scalar(255,0,0), outImg);
 							matches.push_back(n);
-							imshow("Test", outImg);
-							waitKey(0);
+							cout <<"nombre match: "<< n << endl;
+	//						imshow("Test", outImg);
+	//						waitKey(0);
 						}
 					}
 				}
 			}
-			for (int i = 0; i < matches.size(); i++)
-			{
-				if (matches[i] >= 10 && matches[i] <= 25)
-				{
-					matches[i] = abs(matches[i] - 15);					
-}
-			}
 			int minpos = 0;
 			for (int i = 1; i < matches.size(); i++)
 			{
-				if (matches[i] < matches[minpos])
+				if (matches[i] > matches[minpos])
 					minpos = i;
 }
+cout << "pos min "<< minpos << endl;
 int maxvit;
 switch(minpos)
 {
