@@ -1,5 +1,5 @@
-#ifndef PERSPECTIVE_HH
-# define PERSPECTIVE_HH
+#ifndef PERSPECTIVE_DETECTOR_HH
+# define PERSPECTIVE_DETECTOR_HH
 
 #include <opencv2/core/core.hpp>
 
@@ -24,7 +24,7 @@ public:
   }
   double getY() const
   {
-    return r_* std::cos(theta_) * std::sin(phi_); //projette sur yoz puis sur y
+    return r_ * std::cos(theta_) * std::sin(phi_); //projette sur yoz puis sur y
   }
   double getZ() const
   {
@@ -43,4 +43,4 @@ private:
   double phi_ = 0;
 };
 
-#endif //!PERSPECTIVE_HH
+#endif //!PERSPECTIVE_DETECTOR_HH
