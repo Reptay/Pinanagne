@@ -1,6 +1,6 @@
 #include "typePanneau.hh"
 
-bool vrb = true; // Mode verbeux
+bool vrb = false; // Mode verbeux
 
 int getHauteur(Mat imgRed, int rayonFlou, int cx, int cy, int &minBande);
 int getLargeur(Mat imgRed, int rayonFlou, int cx, int cy, int &minBande);

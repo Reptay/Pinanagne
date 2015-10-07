@@ -43,7 +43,7 @@ Mat RedFilter(Mat img)
 	Mat mask5(img.size(), CV_8UC1);
 	Mat mask6(img.size(), CV_8UC1);
 
-	int sMin = 120;
+	int sMin = 100; // 120
 	int sMax = 255;
 	int vMin = 50;
 	int vMax = 255;
@@ -65,7 +65,7 @@ Mat RedFilter(Mat img)
 	inRange(hsv, Scalar(180-hTol, sMin, vMin), Scalar(180, sMax, vMax), mask6);
 
 	Mat mask = mask1+mask2+mask3+mask4+mask5+mask6;
-	//  dp(mask);
+	//dp(mask);
 	return mask;
 }
 
@@ -128,7 +128,7 @@ Mat BlackFilter(Mat img)
 	int vMax = moyValue/2; //70
 
 	inRange(hsv, Scalar(0, sMin, vMin), Scalar(180, sMax, vMax), mask1);
-	//  dp(mask1);
+	//dp(mask1);
 	return mask1;
 
 }
