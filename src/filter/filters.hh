@@ -19,6 +19,7 @@ Mat RedFilterSouple(Mat img);
 Mat BlueFilter(Mat img);
 void BlueRedFilter(Mat img);
 Mat BlackFilter(Mat img);
+Mat WhiteFilter(Mat img);
 void getContour(Mat& img);
 void getOrientation(Mat& img);
 Point findcenter(Mat img, vector<vector<Point> >* ret);
