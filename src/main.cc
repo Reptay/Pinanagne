@@ -228,27 +228,31 @@ cout << "Vitesse maximale autorisée: " << maxvit << endl;
 
 int main(int argc, char* argv[])
 { 
-	//playSound("audio/50.wav");
-	if (argc == 1)
-		fluxWebcam(""); //webcam
-	else if (argc == 2)
-	  fluxWebcam(argv[1]);
-	  //ReadWebcam(argv[1]);
-	else if (argc == 3 && strcmp(argv[1], "-i")==0)
+  SDL_Init(SDL_INIT_AUDIO);
+  //playLimitation("50");
+
+  if (argc == 1)
+    fluxWebcam(""); //webcam
+  else if (argc == 2)
+    fluxWebcam(argv[1]);
+  //ReadWebcam(argv[1]);
+  else if (argc == 3 && strcmp(argv[1], "-i")==0)
+    {
+      Mat img;
+      img = imread(argv[2], CV_LOAD_IMAGE_COLOR);
+      if (img.data)
 	{
-		Mat img;
-		img = imread(argv[2], CV_LOAD_IMAGE_COLOR);
-		if (img.data)
-		{
-			traitementImage(argv[2]);
-			//Comparaison avec les modeles via un surf
-			//findObject(argv[2], 
-			return 0;
-		} else {
-			return 1;
-		}
-		return 2;
-	}
-	else
-		std::cerr << "Invalide argument" << std::endl;
+	  traitementImage(argv[2]);
+	  //Comparaison avec les modeles via un surf
+	  //findObject(argv[2], 
+	  return 0;
+	} else {
+	return 1;
+      }
+      return 2;
+    }
+  else
+    std::cerr << "Invalide argument" << std::endl;
+
+  Mix_CloseAudio();
 }

@@ -9,4 +9,10 @@
 
 void playSound(std::string path);
 
+/**
+ * limitation = "30", "50"...
+ * on ne peut lancer qu'une limitaton à la fois
+ */
+void playLimitation(std::string limitation);
+
 #endif
