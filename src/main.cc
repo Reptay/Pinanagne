@@ -66,7 +66,7 @@ void fluxWebcam(std::string path)
   
   cvReleaseCapture(&capture);
   //cvDestroyWindow("Webcam");
-  exit(0);
+  //  exit(0);
 }
 
 void ReadWebcam(char* path)
@@ -235,7 +235,34 @@ int main(int argc, char* argv[])
     fluxWebcam(""); //webcam
   else if (argc == 2)
     fluxWebcam(argv[1]);
-  //ReadWebcam(argv[1]);
+  else if (argc == 3 && strcmp(argv[1], "-f")==0) // dossier de vidéos en parametre
+    {
+      DIR *dir;
+      struct dirent *ent;
+      if ((dir = opendir (argv[2])) != NULL) {
+	std::string directory(argv[2]);
+	if (directory.back() != '/')
+	  directory += "/";
+	while ((ent = readdir (dir)) != NULL) {
+	  switch (ent->d_type) {
+	  case DT_REG:
+	    printf ("%s\n", ent->d_name);
+	    std::cout << directory << std::endl;
+	    fluxWebcam(directory+ent->d_name);
+	    break;
+	  case DT_DIR:
+	    break;
+	  default:
+	    break;
+	  }
+	}
+	closedir (dir);
+      } else {
+	/* could not open directory */
+	perror ("");
+	return EXIT_FAILURE;
+      }
+    }
   else if (argc == 3 && strcmp(argv[1], "-i")==0)
     {
       Mat img;

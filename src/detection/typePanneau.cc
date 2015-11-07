@@ -101,7 +101,6 @@ Mat* isLimitation(Mat img, Circle* c)
 	  }
       }
    imgBlack = BlackFilter(imgBlack);
-
    std::vector<sForme> formes = nbCouleurContinu(&imgBlack,255);
    // supprime les petites zones (bruit)
    for (std::vector<sForme>::iterator it = formes.begin(); it!=formes.end();){
