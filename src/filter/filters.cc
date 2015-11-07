@@ -71,6 +71,8 @@ int moyenneValue(Mat img)
 	else
 	  nbPoint--;
       }
+  if (nbPoint == 0)
+    return 0;
   return (int) totalValue / nbPoint;
 }
 
@@ -87,7 +89,7 @@ Mat BlackFilter(Mat img)
   int sMin = 0;
   int sMax = 255;
   int vMin = 0;
-  int vMax = moyValue/2; //70
+  int vMax = moyValue/1.5; //70
   
   inRange(hsv, Scalar(0, sMin, vMin), Scalar(180, sMax, vMax), mask1);
   //dp(mask1);

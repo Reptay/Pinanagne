@@ -1,5 +1,6 @@
 #include <cmath>
 #include <string>
+#include <vector>
 #include "filter/filters.hh"
 #include "detection/shape.hh"
 #include "detection/typePanneau.hh"
@@ -9,8 +10,9 @@
 #include "detection/detectRect.hh"
 #include <dirent.h>
 
-void fluxWebcam(std::string path)
+bool fluxWebcam(std::string path)
 {
+  bool panneauDetecte = false;
   //  path = "";
   CvCapture *capture;
   if (path.empty()) // pas testé pour la webcam
@@ -19,6 +21,7 @@ void fluxWebcam(std::string path)
     capture = cvCreateFileCapture(path.c_str());
   if (!capture) {
     printf("Ouverture du flux vidéo impossible !\n");
+    std::cout << path << std::endl;
     exit(1);
   }
   
@@ -42,8 +45,8 @@ void fluxWebcam(std::string path)
       Mat* m = isLimitation(img, *it);
       if (m != NULL){
 	panneaux.push_back(*m);
-	std::cerr <<std::endl<<
-	  "----------------" <<"OK"<<"----------------" << std::endl;
+	//std::cerr << "----------------" <<"OK"<<"----------------" << std::endl;
+	panneauDetecte=true;
 	(*it)->draw(img,0,255,0);
       }
       else
@@ -67,6 +70,7 @@ void fluxWebcam(std::string path)
   cvReleaseCapture(&capture);
   //cvDestroyWindow("Webcam");
   //  exit(0);
+  return panneauDetecte;
 }
 
 void ReadWebcam(char* path)
@@ -237,6 +241,9 @@ int main(int argc, char* argv[])
     fluxWebcam(argv[1]);
   else if (argc == 3 && strcmp(argv[1], "-f")==0) // dossier de vidéos en parametre
     {
+      std::vector<std::string> filenameNonDetecte;
+      int nbVideos = 0;
+      int nbDetecte = 0;
       DIR *dir;
       struct dirent *ent;
       if ((dir = opendir (argv[2])) != NULL) {
@@ -244,16 +251,16 @@ int main(int argc, char* argv[])
 	if (directory.back() != '/')
 	  directory += "/";
 	while ((ent = readdir (dir)) != NULL) {
-	  switch (ent->d_type) {
-	  case DT_REG:
+	  if (ent->d_type == DT_REG){
+	    nbVideos++;
 	    printf ("%s\n", ent->d_name);
-	    std::cout << directory << std::endl;
-	    fluxWebcam(directory+ent->d_name);
-	    break;
-	  case DT_DIR:
-	    break;
-	  default:
-	    break;
+	    std::string filename = directory+ent->d_name;
+	    std::cout << filename << std::endl;
+	    bool detecte = fluxWebcam(filename);
+	    if (detecte)
+	      nbDetecte ++;
+	    else
+	      filenameNonDetecte.push_back(filename);
 	  }
 	}
 	closedir (dir);
@@ -262,6 +269,12 @@ int main(int argc, char* argv[])
 	perror ("");
 	return EXIT_FAILURE;
       }
+      std::cout << "Vidéos où panneaux non detectées : " << std::endl;
+      for (std::vector<std::string>::iterator it = filenameNonDetecte.begin() ;
+	   it != filenameNonDetecte.end(); ++it)
+	std::cout << "- " << *it << std::endl;
+      std::cout << nbVideos << " vidéos et " << nbDetecte << " panneaux detectés"
+		<< std::endl;
     }
   else if (argc == 3 && strcmp(argv[1], "-i")==0)
     {

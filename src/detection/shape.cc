@@ -62,7 +62,7 @@ std::vector<Circle*> getCirclesByEllipses(Mat src)
   RNG rng(12345);
   std::vector<Rectangle> rects;
 
-  double factorSize = 0.5;
+  double factorSize = 0.4;
   resize(src, src, Size(), factorSize, factorSize, cv::INTER_LANCZOS4);
 
 
