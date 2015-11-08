@@ -1,6 +1,8 @@
 #include <cmath>
 #include <string>
 #include <vector>
+#include <thread>         // std::thread
+#include <mutex>          // std::mutex
 #include "filter/filters.hh"
 #include "detection/shape.hh"
 #include "detection/typePanneau.hh"
@@ -9,6 +11,25 @@
 #include "surf/surf.hh"
 #include "detection/detectRect.hh"
 #include <dirent.h>
+
+std::mutex mtx;
+Mat*  paralIsLimitation(Mat img, Circle* circle, std::vector<Mat>* panneaux)
+{
+  Mat* m = isLimitation(img, circle);
+  if (m != NULL)
+    {
+      mtx.lock();
+      panneaux->push_back(*m);
+      circle->draw(img,0,255,0);
+      mtx.unlock();
+    }
+  else
+    {
+      mtx.lock();
+      circle->draw(img);
+      mtx.unlock();
+    }
+}
 
 bool fluxWebcam(std::string path)
 {
@@ -27,7 +48,6 @@ bool fluxWebcam(std::string path)
   
   char key;
   IplImage *image;
-  // cvNamedWindow("Webcam", CV_WINDOW_AUTOSIZE);
   // Boucle tant que l'utilisateur n'appuie pas sur la touche q (ou Q)
   while(key != 'q' && key != 'Q') {
     // On récupère une image
@@ -38,21 +58,34 @@ bool fluxWebcam(std::string path)
     
     // std::vector<Circle*> circles = getCircles(img);
     std::vector<Circle*> circles=getCirclesByEllipses(img.clone());
-    
     std::vector<Mat> panneaux;
-    for (std::vector<Circle*>::iterator it = circles.begin();
-	 it != circles.end(); it++){
-      Mat* m = isLimitation(img, *it);
-      if (m != NULL){
-	panneaux.push_back(*m);
-	//std::cerr << "----------------" <<"OK"<<"----------------" << std::endl;
-	panneauDetecte=true;
-	(*it)->draw(img,0,255,0);
+
+
+    if (circles.size() > 1){ // PARALLELE
+      std::thread threads[circles.size()];
+      int iter = 0;    
+      for (std::vector<Circle*>::iterator it = circles.begin();
+	   it != circles.end(); it++){
+	threads[iter] = std::thread(paralIsLimitation, img, *it,&panneaux);
+	iter++;
       }
-      else
-	(*it)->draw(img);
-      
+      for (auto& th : threads) th.join();
     }
+    else{ // SEQUENTIEL
+      for (std::vector<Circle*>::iterator it = circles.begin();
+	   it != circles.end(); it++){
+	Mat* m = isLimitation(img, *it);
+	if (m != NULL){
+	  panneaux.push_back(*m); // panneau detecte
+	  (*it)->draw(img,0,255,0);
+	}
+	else
+	  (*it)->draw(img);      
+      }
+    }
+    if (panneaux.size() > 0)
+      panneauDetecte=true;
+
     for (std::vector<Mat>::iterator it = panneaux.begin();
 	 it != panneaux.end(); it++){
       namedWindow("Display", WINDOW_AUTOSIZE);
