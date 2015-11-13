@@ -96,6 +96,7 @@ bool fluxWebcam(std::string path)
     
     IplImage image2=img;
     cvShowImage( "Webcam", &image2);
+    //waitKey(0); 
     // On attend 10ms
     key = cvWaitKey(1);
   }
