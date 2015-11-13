@@ -97,7 +97,11 @@ void ReadWebcam(int device)
 	}
 }
 
-void traitementImage(char* path)
+//Return vitzone * 1000 + maxvit
+//vitzone => vitesse dans la zone
+//maxvit => vitesse maximale autorisée
+
+int traitementImage(char* path)
 {
 	int vitzone = 90;
 	Mat img;
@@ -171,6 +175,7 @@ switch(minpos)
 	default: maxvit = 50;
 }
 cout << "Vitesse maximale autorisée: " << maxvit << endl;
+return vitzone*1000 + maxvit;
 			//Mat mod = imread("./modeles/90km6.png");
 			//Mat dst = *it;
 			//Mat tmp = dst;
