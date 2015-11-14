@@ -1,6 +1,6 @@
 #include "typePanneau.hh"
 
-bool vrb = false; // Mode verbeux
+bool vrb = false;//true;//false; // Mode verbeux
 
 int getHauteur(Mat imgRed, int rayonFlou, int cx, int cy, int &minBande);
 int getLargeur(Mat imgRed, int rayonFlou, int cx, int cy, int &minBande);
@@ -43,6 +43,7 @@ Mat* isLimitation(Mat img, Circle* c)
 
   //  Mat imgRed = img.clone();
   Mat imgRed = RedFilter(img);
+  //  dp(imgRed);
   int rayonFlou = 2; // pour le calcul hauteur et largeur du cercle rouge
   int minBande = 0;
   int hauteur =  getHauteur(imgRed, rayonFlou, cx, cy, minBande);
@@ -101,7 +102,6 @@ Mat* isLimitation(Mat img, Circle* c)
 	  }
       }
    imgBlack = BlackFilter(imgBlack);
-
    std::vector<sForme> formes = nbCouleurContinu(&imgBlack,255);
    // supprime les petites zones (bruit)
    for (std::vector<sForme>::iterator it = formes.begin(); it!=formes.end();){
@@ -121,10 +121,11 @@ Mat* isLimitation(Mat img, Circle* c)
    }
    
    for (unsigned long i = 0; i < formes.size(); i++)
-     if (compare(hauteur, formes[i].hauteur) > 1.7){
+     if (compare(hauteur, formes[i].hauteur) > 2.3 ||
+	 compare(formes[i].hauteur, formes[i].largeur) < 1.2){
        if (vrb)
 	 std::cerr << "typePanneau.cc Invalide Hauteur de forme continu : " <<
-	   formes[i].hauteur << std::endl;
+	   compare(hauteur, formes[i].hauteur) << std::endl;
        return NULL;
      }
    
@@ -214,8 +215,8 @@ int getHauteur(Mat imgRed, int rayonFlou, int cx, int cy, int &minBande){
 	bandeHaut << " " << bandeBas <<std::endl;
     return 0;
   }
-  if (hauteur / bandeBas < 1.5 || hauteur / bandeBas > 7 ||
-      hauteur / bandeHaut < 1.5 || hauteur / bandeHaut > 7){
+  if ((double)hauteur / bandeBas < 1.5 || (double)hauteur / bandeBas > 7 ||
+      (double)hauteur / bandeHaut < 1.5 || (double)hauteur / bandeHaut > 7){
     if (vrb)
       std::cout <<
 	"Hauteur disproportionné par rapport au contour, typePanneau.cc "<<
@@ -285,8 +286,8 @@ int getLargeur(Mat imgRed, int rayonFlou, int cx, int cy, int &minBande){
 		<<std::endl;
     return 0;
   }
-  if (largeur / bandeDroite < 1.5 || largeur / bandeDroite > 10 ||
-      largeur / bandeGauche < 1.5 || largeur / bandeGauche > 10){
+  if ((double)largeur / bandeDroite < 1.5 || (double)largeur / bandeDroite > 10 ||
+      (double)largeur / bandeGauche < 1.5 || (double)largeur / bandeGauche > 10){
     if (vrb)
       std::cout <<
 	"largeur disproportionné par rapport au contour, typePanneau.cc "<<

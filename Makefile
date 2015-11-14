@@ -45,6 +45,35 @@ check50: all
 	./pinanagne tests/video/vitesse_reel_inf50/panneau_50_2.mp4
 	./pinanagne tests/video/vitesse_reel_inf50/panneau_50_3.mp4
 
+checkw1: all
+	./pinanagne tests/video/w1/110_1_mv.mp4
+	./pinanagne tests/video/w1/30_et_fin_30_1.mp4
+	./pinanagne tests/video/w1/90\(100\)_2_avec_70.mp4
+	./pinanagne tests/video/w1/110\(20\)_6.mp4
+	./pinanagne tests/video/w1/50_1.mp4
+	./pinanagne tests/video/w1/90\(110\)_3_avec_70.mp4
+	./pinanagne tests/video/w1/110_2.mp4
+	./pinanagne tests/video/w1/50_2.mp4
+	./pinanagne tests/video/w1/90_1.mp4
+	./pinanagne tests/video/w1/110_3.mp4
+	./pinanagne tests/video/w1/50_3.mp4
+	./pinanagne tests/video/w1/90_5.mp4
+	./pinanagne tests/video/w1/110_4.mp4
+	./pinanagne tests/video/w1/50_4_mv.mp4
+	./pinanagne tests/video/w1/90_6.mp4
+	./pinanagne tests/video/w1/110_5.mp4
+	./pinanagne tests/video/w1/50_5.mp4
+	./pinanagne tests/video/w1/90\(90\)_4_mv.mp4
+	./pinanagne tests/video/w1/110\(90\)_3.mp4
+	./pinanagne tests/video/w1/50_6.mp4
+	./pinanagne tests/video/w1/autoroute_fin_1.mp4
+	./pinanagne tests/video/w1/20_1.mp4
+	./pinanagne tests/video/w1/70_1.mp4
+	./pinanagne tests/video/w1/30_1.mp4
+	./pinanagne tests/video/w1/70_3.mp4
+	./pinanagne tests/video/w1/30_2.mp4
+	./pinanagne tests/video/w1/70\(90\)_2.mp4
+
 checkv1: all
 	./pinanagne tests/video/nationale/1/panneau1.mp4
 
