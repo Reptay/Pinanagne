@@ -83,7 +83,6 @@ Mat BlackFilter(Mat img)
   cvtColor(img, hsv, CV_BGR2HSV);
   
   int moyValue = moyenneValue(hsv);
-  //  std::cout << "-----> " << moyValue << std::endl;
   
   Mat mask1(img.size(), CV_8UC1);
   int sMin = 0;
@@ -166,49 +165,6 @@ void BlueRedFilter(Mat img)
 		}
 
 }
-/*
-   Mat BlackFilter(Mat img)
-   {
-
-   for (int i = 0; i < img.cols; i++)
-   for (int j = 0; j < img.rows; j++)
-   {
-   Point3_<uchar>* p = img.ptr<Point3_<uchar> >(j,i);
-
-   int r = p->z;
-   int g = p->y;
-   int b = p->x;
-   / *
-   double diffrg = 1;
-   if (r != 0 && g != 0)
-   diffrg = (r>g) ? r/g : g/r;
-   double diffrb = 1;
-   if (r != 0 && b != 0)
-   diffrb=(r>b) ? r/b : b/r;
-   double diffgb = 1;
-   if (g != 0 && b != 0)
-   diffgb = (g>b) ? g/b : b/g;
- * /
- if ((r+g+b < 50 && r+g>b && r+b>g && g+b>r) ||
- (r+g+b<30)) / *||
- (r < 50 && b < 50 && g < 50) ||
- (r<100 && b < 100 && g < 100 && r+g>b && r+b>g && g+b>r)
- ||(diffrg < 1.3 && diffrb < 1.3 && diffgb < 1.3 && r+g+b<350))* /
- {
- p->z = 255;
- p->x = 255;
- p->y = 255;
- }
- else
- {
- p->z = 0;
- p->y = 0;
- p->x = 0;
- }
-
- }
-
- }*/
 
 void To_TSV(Mat img)
 {
