@@ -11,6 +11,7 @@
 #include "surf/surf.hh"
 #include "detection/detectRect.hh"
 #include <dirent.h>
+#include "image_preprocessing/traitement.hh"
 
 std::mutex mtx;
 Mat*  paralIsLimitation(Mat img, Circle* circle, std::vector<Mat>* panneaux)
@@ -56,7 +57,6 @@ bool fluxWebcam(std::string path)
 		if (img.empty())
 			break;
 
-		// std::vector<Circle*> circles = getCircles(img);
 		std::vector<Circle*> circles=getCirclesByEllipses(img.clone());
 		std::vector<Mat> panneaux;
 
@@ -90,8 +90,6 @@ bool fluxWebcam(std::string path)
 				it != panneaux.end(); it++){
 			namedWindow("Display", WINDOW_AUTOSIZE);
 			imshow("Display", *it);
-			//waitKey(0);
-			// RANSAC ICI, normalement il y a un panneau au maximum dans le vector
 		}
 
 		IplImage image2=img;
@@ -138,7 +136,7 @@ void ReadWebcam(int device)
 //Return vitzone * 1000 + maxvit
 //vitzone => vitesse dans la zone
 //maxvit => vitesse maximale autorisée
-
+/*
 int traitementImage(char* path)
 {
 	int vitzone = 90;
@@ -154,8 +152,8 @@ int traitementImage(char* path)
 			vitzone = maxvit =  130;
 		else if (vitzone == 50 && endCity(img))
 			vitzone = maxvit = 90;
-		cout << "Vitesse maximale dans cette zone: " << vitzone << endl;
-		/******* Detection d'un panneau de limitation *******/
+		cout << "Vitesse maximale dans cette zone: " << vitzone << endl;*/
+		/******* Detection d'un panneau de limitation *******//*
 		std::vector<Circle*> circles = getCirclesByEllipses(img);
 		std::vector<Mat> panneaux;
 		for (std::vector<Circle*>::iterator it = circles.begin();
@@ -190,8 +188,6 @@ int traitementImage(char* path)
 							int n = findObject(*it, mod, 500, Scalar(255,0,0), outImg);
 							matches.push_back(n);
 							cout <<"nombre match: "<< n << endl;
-							//						imshow("Test", outImg);
-							//						waitKey(0);
 						}
 					}
 				}
@@ -214,53 +210,8 @@ int traitementImage(char* path)
 			}
 			cout << "Vitesse maximale autorisée: " << maxvit << endl;
 			return vitzone*1000 + maxvit;
-			//Mat mod = imread("./modeles/90km6.png");
-			//Mat dst = *it;
-			//Mat tmp = dst;
-			/*		while (dst.cols < mod.cols && dst.rows < mod.rows)
-					{
-					pyrUp(tmp, dst, Size(dst.cols * 2, dst.rows * 2));
-					tmp = dst;
-					}*/
-			//Mat dest = dst;
-			//pyrUp(dst, dest, Size(dst.cols * 2, dst.rows * 2));
-			//dst = dest;
-			//pyrUp(dest, dst, Size(dest.cols*2, dest.rows*2));
-			/*		Mat outImg = dst;
-					int n = findObject(dst, mod, 2500, Scalar(255,0,0), outImg);
-					matches.push_back(n);		
-					imshow("Test", outImg);
-					waitKey(0);*/
-			/*namedWindow("Display", WINDOW_AUTOSIZE);
-			  imshow("Display", *it);
-			  waitKey(0);*/
-		}
+	}
 		exit(0);
-		//c->draw(img);
-		/*BlueRedFilter(img);
-		  getContour(img);
-		  blur(img, img, Size(20,20));
-		  namedWindow("Display", WINDOW_AUTOSIZE);
-		  imshow("Display", img);
-		  waitKey(0);*/
-		/***************************************************/
-		/******* Lecture du panneau *******/
-		/*
-		   vector<vector<Point> > ret;
-		   cvtColor(img, img, CV_BGR2GRAY);
-		   Point center = findcenter(img, &ret);
-		   vector<float> ellipses = checkEllipse(img, &ret);
-		   vector<int> squares = checkSquare(&ret);
-		   vector<int> triangles = checkTriangle(&ret);
-
-		   for (uint i = 0; i < ellipses.size(); i++)
-		   {
-		   int val = giveForm(triangles[i], ellipses[i], squares[i]);
-		   cout << val << endl;
-		   }
-		   cout << "x=" << center.x << "y=" << center.y << endl;
-		 */
-		/***************************************************/
 	}
 	else
 	{
@@ -268,11 +219,10 @@ int traitementImage(char* path)
 		exit(1);
 	}
 }
-
+*/
 int main(int argc, char* argv[])
 { 
 	SDL_Init(SDL_INIT_AUDIO);
-	//playLimitation("50");
 
 	if (argc == 1)
 		fluxWebcam(""); //webcam
@@ -323,7 +273,6 @@ int main(int argc, char* argv[])
 		{
 			traitementImage(argv[2]);
 			//Comparaison avec les modeles via un surf
-			//findObject(argv[2], 
 			return 0;
 		} else {
 			return 1;
