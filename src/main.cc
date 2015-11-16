@@ -15,96 +15,96 @@
 std::mutex mtx;
 Mat*  paralIsLimitation(Mat img, Circle* circle, std::vector<Mat>* panneaux)
 {
-  Mat* m = isLimitation(img, circle);
-  if (m != NULL)
-    {
-      mtx.lock();
-      panneaux->push_back(*m);
-      circle->draw(img,0,255,0);
-      mtx.unlock();
-    }
-  else
-    {
-      mtx.lock();
-      circle->draw(img);
-      mtx.unlock();
-    }
+	Mat* m = isLimitation(img, circle);
+	if (m != NULL)
+	{
+		mtx.lock();
+		panneaux->push_back(*m);
+		circle->draw(img,0,255,0);
+		mtx.unlock();
+	}
+	else
+	{
+		mtx.lock();
+		circle->draw(img);
+		mtx.unlock();
+	}
 }
 
 bool fluxWebcam(std::string path)
 {
-  bool panneauDetecte = false;
-  //  path = "";
-  CvCapture *capture;
-  if (path.empty()) // pas testé pour la webcam
-    capture = cvCreateCameraCapture( CV_CAP_ANY );
-  else
-    capture = cvCreateFileCapture(path.c_str());
-  if (!capture) {
-    printf("Ouverture du flux vidéo impossible !\n");
-    std::cout << path << std::endl;
-    exit(1);
-  }
-  
-  char key;
-  IplImage *image;
-  // Boucle tant que l'utilisateur n'appuie pas sur la touche q (ou Q)
-  while(key != 'q' && key != 'Q') {
-    // On récupère une image
-    image = cvQueryFrame(capture);
-    Mat img = cvarrToMat(image);
-    if (img.empty())
-      break;
-    
-    // std::vector<Circle*> circles = getCircles(img);
-    std::vector<Circle*> circles=getCirclesByEllipses(img.clone());
-    std::vector<Mat> panneaux;
-
-
-    if (circles.size() > 1){ // PARALLELE
-      std::thread threads[circles.size()];
-      int iter = 0;    
-      for (std::vector<Circle*>::iterator it = circles.begin();
-	   it != circles.end(); it++){
-	threads[iter] = std::thread(paralIsLimitation, img, *it,&panneaux);
-	iter++;
-      }
-      for (auto& th : threads) th.join();
-    }
-    else{ // SEQUENTIEL
-      for (std::vector<Circle*>::iterator it = circles.begin();
-	   it != circles.end(); it++){
-	Mat* m = isLimitation(img, *it);
-	if (m != NULL){
-	  panneaux.push_back(*m); // panneau detecte
-	  (*it)->draw(img,0,255,0);
-	}
+	bool panneauDetecte = false;
+	//  path = "";
+	CvCapture *capture;
+	if (path.empty()) // pas testé pour la webcam
+		capture = cvCreateCameraCapture( CV_CAP_ANY );
 	else
-	  (*it)->draw(img);      
-      }
-    }
-    if (panneaux.size() > 0)
-      panneauDetecte=true;
+		capture = cvCreateFileCapture(path.c_str());
+	if (!capture) {
+		printf("Ouverture du flux vidéo impossible !\n");
+		std::cout << path << std::endl;
+		exit(1);
+	}
 
-    for (std::vector<Mat>::iterator it = panneaux.begin();
-	 it != panneaux.end(); it++){
-      namedWindow("Display", WINDOW_AUTOSIZE);
-      imshow("Display", *it);
-      //waitKey(0);
-      // RANSAC ICI, normalement il y a un panneau au maximum dans le vector
-    }
-    
-    IplImage image2=img;
-    cvShowImage( "Webcam", &image2);
-    //waitKey(0); 
-    // On attend 10ms
-    key = cvWaitKey(1);
-  }
-  
-  cvReleaseCapture(&capture);
-  //cvDestroyWindow("Webcam");
-  //  exit(0);
-  return panneauDetecte;
+	char key;
+	IplImage *image;
+	// Boucle tant que l'utilisateur n'appuie pas sur la touche q (ou Q)
+	while(key != 'q' && key != 'Q') {
+		// On récupère une image
+		image = cvQueryFrame(capture);
+		Mat img = cvarrToMat(image);
+		if (img.empty())
+			break;
+
+		// std::vector<Circle*> circles = getCircles(img);
+		std::vector<Circle*> circles=getCirclesByEllipses(img.clone());
+		std::vector<Mat> panneaux;
+
+
+		if (circles.size() > 1){ // PARALLELE
+			std::thread threads[circles.size()];
+			int iter = 0;    
+			for (std::vector<Circle*>::iterator it = circles.begin();
+					it != circles.end(); it++){
+				threads[iter] = std::thread(paralIsLimitation, img, *it,&panneaux);
+				iter++;
+			}
+			for (auto& th : threads) th.join();
+		}
+		else{ // SEQUENTIEL
+			for (std::vector<Circle*>::iterator it = circles.begin();
+					it != circles.end(); it++){
+				Mat* m = isLimitation(img, *it);
+				if (m != NULL){
+					panneaux.push_back(*m); // panneau detecte
+					(*it)->draw(img,0,255,0);
+				}
+				else
+					(*it)->draw(img);      
+			}
+		}
+		if (panneaux.size() > 0)
+			panneauDetecte=true;
+
+		for (std::vector<Mat>::iterator it = panneaux.begin();
+				it != panneaux.end(); it++){
+			namedWindow("Display", WINDOW_AUTOSIZE);
+			imshow("Display", *it);
+			//waitKey(0);
+			// RANSAC ICI, normalement il y a un panneau au maximum dans le vector
+		}
+
+		IplImage image2=img;
+		cvShowImage( "Webcam", &image2);
+		//waitKey(0); 
+		// On attend 10ms
+		key = cvWaitKey(1);
+	}
+
+	cvReleaseCapture(&capture);
+	//cvDestroyWindow("Webcam");
+	//  exit(0);
+	return panneauDetecte;
 }
 
 void ReadWebcam(char* path)
@@ -144,16 +144,17 @@ int traitementImage(char* path)
 	int vitzone = 90;
 	Mat img;
 	img = imread(path, CV_LOAD_IMAGE_COLOR);
+	int maxvit;
 
 	if (img.data)
 	{
 		if (vitzone == 90 && isCity(img))
-			vitzone = 50;
+			vitzone = maxvit = 50;
 		else if (vitzone == 90 && isHighWay(img))
-			vitzone = 130;
+			vitzone = maxvit =  130;
 		else if (vitzone == 50 && endCity(img))
-			vitzone = 90;
-cout << "Vitesse maximale dans cette zone: " << vitzone << endl;
+			vitzone = maxvit = 90;
+		cout << "Vitesse maximale dans cette zone: " << vitzone << endl;
 		/******* Detection d'un panneau de limitation *******/
 		std::vector<Circle*> circles = getCirclesByEllipses(img);
 		std::vector<Mat> panneaux;
@@ -167,10 +168,10 @@ cout << "Vitesse maximale dans cette zone: " << vitzone << endl;
 		for (std::vector<Mat>::iterator it = panneaux.begin();
 				it != panneaux.end(); it++){
 			DIR* d;
-							cvtColor(*it, *it, CV_BGR2GRAY);
+			cvtColor(*it, *it, CV_BGR2GRAY);
 			d = opendir("./modeles/vitesse");
 			if (!d)
-				return;
+				exit(1);
 			struct dirent* f;
 			while ((f = readdir(d)))
 			{
@@ -189,8 +190,8 @@ cout << "Vitesse maximale dans cette zone: " << vitzone << endl;
 							int n = findObject(*it, mod, 500, Scalar(255,0,0), outImg);
 							matches.push_back(n);
 							cout <<"nombre match: "<< n << endl;
-	//						imshow("Test", outImg);
-	//						waitKey(0);
+							//						imshow("Test", outImg);
+							//						waitKey(0);
 						}
 					}
 				}
@@ -200,20 +201,19 @@ cout << "Vitesse maximale dans cette zone: " << vitzone << endl;
 			{
 				if (matches[i] > matches[minpos])
 					minpos = i;
-}
-cout << "pos min "<< minpos << endl;
-int maxvit;
-switch(minpos)
-{
-	case 0: maxvit = 130; break;
-	case 1: maxvit = 90; break;
-	case 2: maxvit = 30; break;
-	case 3: maxvit = 70; break;
-	case 4: maxvit = 110; break;
-	default: maxvit = 50;
-}
-cout << "Vitesse maximale autorisée: " << maxvit << endl;
-return vitzone*1000 + maxvit;
+			}
+			cout << "pos min "<< minpos << endl;
+			switch(minpos)
+			{
+				case 0: maxvit = 130; break;
+				case 1: maxvit = 90; break;
+				case 2: maxvit = 30; break;
+				case 3: maxvit = 70; break;
+				case 4: maxvit = 110; break;
+				default: maxvit = 50;
+			}
+			cout << "Vitesse maximale autorisée: " << maxvit << endl;
+			return vitzone*1000 + maxvit;
 			//Mat mod = imread("./modeles/90km6.png");
 			//Mat dst = *it;
 			//Mat tmp = dst;
@@ -271,67 +271,67 @@ return vitzone*1000 + maxvit;
 
 int main(int argc, char* argv[])
 { 
-  SDL_Init(SDL_INIT_AUDIO);
-  //playLimitation("50");
+	SDL_Init(SDL_INIT_AUDIO);
+	//playLimitation("50");
 
-  if (argc == 1)
-    fluxWebcam(""); //webcam
-  else if (argc == 2)
-    fluxWebcam(argv[1]);
-  else if (argc == 3 && strcmp(argv[1], "-f")==0) // dossier de vidéos en parametre
-    {
-      std::vector<std::string> filenameNonDetecte;
-      int nbVideos = 0;
-      int nbDetecte = 0;
-      DIR *dir;
-      struct dirent *ent;
-      if ((dir = opendir (argv[2])) != NULL) {
-	std::string directory(argv[2]);
-	if (directory.back() != '/')
-	  directory += "/";
-	while ((ent = readdir (dir)) != NULL) {
-	  if (ent->d_type == DT_REG){
-	    nbVideos++;
-	    printf ("%s\n", ent->d_name);
-	    std::string filename = directory+ent->d_name;
-	    std::cout << filename << std::endl;
-	    bool detecte = fluxWebcam(filename);
-	    if (detecte)
-	      nbDetecte ++;
-	    else
-	      filenameNonDetecte.push_back(filename);
-	  }
-	}
-	closedir (dir);
-      } else {
-	/* could not open directory */
-	perror ("");
-	return EXIT_FAILURE;
-      }
-      std::cout << "Vidéos où panneaux non detectées : " << std::endl;
-      for (std::vector<std::string>::iterator it = filenameNonDetecte.begin() ;
-	   it != filenameNonDetecte.end(); ++it)
-	std::cout << "- " << *it << std::endl;
-      std::cout << nbVideos << " vidéos et " << nbDetecte << " panneaux detectés"
-		<< std::endl;
-    }
-  else if (argc == 3 && strcmp(argv[1], "-i")==0)
-    {
-      Mat img;
-      img = imread(argv[2], CV_LOAD_IMAGE_COLOR);
-      if (img.data)
+	if (argc == 1)
+		fluxWebcam(""); //webcam
+	else if (argc == 2)
+		fluxWebcam(argv[1]);
+	else if (argc == 3 && strcmp(argv[1], "-f")==0) // dossier de vidéos en parametre
 	{
-	  traitementImage(argv[2]);
-	  //Comparaison avec les modeles via un surf
-	  //findObject(argv[2], 
-	  return 0;
-	} else {
-	return 1;
-      }
-      return 2;
-    }
-  else
-    std::cerr << "Invalide argument" << std::endl;
+		std::vector<std::string> filenameNonDetecte;
+		int nbVideos = 0;
+		int nbDetecte = 0;
+		DIR *dir;
+		struct dirent *ent;
+		if ((dir = opendir (argv[2])) != NULL) {
+			std::string directory(argv[2]);
+			if (directory.back() != '/')
+				directory += "/";
+			while ((ent = readdir (dir)) != NULL) {
+				if (ent->d_type == DT_REG){
+					nbVideos++;
+					printf ("%s\n", ent->d_name);
+					std::string filename = directory+ent->d_name;
+					std::cout << filename << std::endl;
+					bool detecte = fluxWebcam(filename);
+					if (detecte)
+						nbDetecte ++;
+					else
+						filenameNonDetecte.push_back(filename);
+				}
+			}
+			closedir (dir);
+		} else {
+			/* could not open directory */
+			perror ("");
+			return EXIT_FAILURE;
+		}
+		std::cout << "Vidéos où panneaux non detectées : " << std::endl;
+		for (std::vector<std::string>::iterator it = filenameNonDetecte.begin() ;
+				it != filenameNonDetecte.end(); ++it)
+			std::cout << "- " << *it << std::endl;
+		std::cout << nbVideos << " vidéos et " << nbDetecte << " panneaux detectés"
+			<< std::endl;
+	}
+	else if (argc == 3 && strcmp(argv[1], "-i")==0)
+	{
+		Mat img;
+		img = imread(argv[2], CV_LOAD_IMAGE_COLOR);
+		if (img.data)
+		{
+			traitementImage(argv[2]);
+			//Comparaison avec les modeles via un surf
+			//findObject(argv[2], 
+			return 0;
+		} else {
+			return 1;
+		}
+		return 2;
+	}
+	else
+		std::cerr << "Invalide argument" << std::endl;
 
-  Mix_CloseAudio();
+	Mix_CloseAudio();
 }

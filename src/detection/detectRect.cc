@@ -46,17 +46,17 @@ return detectRect(red).size() > 0;
 bool isHighWay(Mat img)
 {
 Mat blue = BlueFilter(img);
-imshow("blue", blue);
-waitKey();
+//imshow("blue", blue);
+//waitKey();
 vector<Rect> rects = detectRect(blue);
-cout << "size: " << rects.size() << endl;
+//cout << "size: " << rects.size() << endl;
 for (int i = 0; i < rects.size(); i++)
 {
 Mat interimg = Mat (img, rects[i]);
 Mat label = imread("./modeles/autoroutes/autoroute.jpg");
 Mat outimg = img;
 int n = findObject(interimg, label, 500, Scalar(255,0,0), outimg);
-waitKey();
+//waitKey();
 if (n > 0)
 return true;
 }
@@ -75,4 +75,12 @@ if (nbWhitePix(red) > 0)
 return true;
 }
 return false;
+}
+
+bool endHighWay(Mat img)
+{
+Mat label = imread("./modeles/autoroutes/fin.png");
+Mat outimg = img;
+int n = findObject(img, label, 500, Scalar(255,0,0), outimg);
+return n > 0;
 }
