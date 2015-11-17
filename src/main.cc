@@ -83,19 +83,20 @@ bool fluxWebcam(std::string path)
 			for (int i = 1; i < matchs.size(); i++)
 
 				if (m < matchs[i])
-{
-m = matchs[i];
+				{
+					m = matchs[i];
 					v = i;
-}
+				}
 			if (v == 3 || v == 5)
 				vitmax = v * 10;
 			else
 				vitmax = (v + 7) *10;
 			if (m)
-			playLimitation(std::to_string(vitmax));		
+				playLimitation(std::to_string(vitmax));		
 			matchs.clear();
 			matchs = vector<int>(7,0);
 			compt = 0;
+			key = cvWaitKey(1);
 		}
 		/*if (circles.size() > 1){ // PARALLELE
 		  std::thread threads[circles.size()];
