@@ -4,11 +4,9 @@
 //vitzone => vitesse dans la zone
 //maxvit => vitesse maximale autorisée
 
-int traitementImage(char* path)
+int traitementImage(Mat img)
 {
 	int vitzone = 90;
-	Mat img;
-	img = imread(path, CV_LOAD_IMAGE_COLOR);
 	int maxvit;
 
 	if (img.data)
@@ -65,7 +63,6 @@ int traitementImage(char* path)
 				if (matches[i] > matches[minpos])
 					minpos = i;
 			}
-			cout << "pos min "<< minpos << endl;
 			switch(minpos)
 			{
 				case 0: maxvit = 130; break;
@@ -78,7 +75,7 @@ int traitementImage(char* path)
 			cout << "Vitesse maximale autorisée: " << maxvit << endl;
 			return vitzone*1000 + maxvit;
 		}
-		exit(0);
+		return 0;
 	}
 	else
 	{

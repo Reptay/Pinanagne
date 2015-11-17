@@ -14,6 +14,6 @@
 #include "../detection/detectRect.hh"
 #include <dirent.h>
 
-int traitementImage(char* path);
+int traitementImage(Mat img);
 
 #endif

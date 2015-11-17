@@ -14,7 +14,7 @@ int findObject(Mat sceneP, Mat objectP, int minHessian, Scalar color, Mat outImg
 
 
 
-	SIFT sift(10,1);
+	SIFT sift(50,1);
 	Mat detector;
 	sift(objectP, Mat(), keypointsO, detector);
 	sift(sceneP, Mat(), keypointsS, detector);
@@ -66,11 +66,11 @@ int findObject(Mat sceneP, Mat objectP, int minHessian, Scalar color, Mat outImg
 
 
 	// drawing the results
-	namedWindow("matches");
+	/*namedWindow("matches");
 	Mat img_matches;
 	drawMatches(objectP, keypointsO, sceneP, keypointsS, good_matches, img_matches);
 	imwrite("show.jpg", img_matches);
 	imshow("matches", img_matches);
-	waitKey(100);
+	waitKey(100);*/
 	return good_matches.size();
 }
