@@ -54,10 +54,12 @@ bool fluxWebcam(std::string path)
 	int vitmax = 0;
 	int vitzone = 0;
 	int compt = 0;
+	int match = 0;
 	//vector<int> matchs = vector<int>(7, 0);
 	vector<Mat> save = vector<Mat>();
 	vector<Mat> sav = vector<Mat>();
 	vector<Mat> sa = vector<Mat>();
+	vector<Mat> saving = vector<Mat>();
 	// Boucle tant que l'utilisateur n'appuie pas sur la touche q (ou Q)
 	while(key != 'q' && key != 'Q') {
 		// On récupère une image
@@ -95,6 +97,7 @@ bool fluxWebcam(std::string path)
 		{
 			panneauDetecte=true;
 			compt = 0;
+			saving = sa;
 			sa = sav;
 			sav = save;
 			save = panneaux;
@@ -104,22 +107,43 @@ bool fluxWebcam(std::string path)
 		if (save.size() != 0 && compt > 20)
 		{
 			int vit = traitementImage(save);
-			if (vit%1000)
-				playLimitation(std::to_string(vit%1000));
-			else
+			match = vit / 1000000;
+			vitmax = vit%1000;
+			vit = traitementImage(sav);
+			if (vitmax == vit % 1000)
+				match += 10;
+			if (match < vit / 1000000)
 			{
-				vit = traitementImage(sav);
-				if (vit%1000)
-					playLimitation(std::to_string(vit%1000));
-				else
-				{
+vitmax = vit % 1000;
+match = vit / 1000000;
+}
+
 					vit = traitementImage(sa);
-					if (vit%1000)
-						playLimitation(std::to_string(vit%1000));
-				}
-			}
+if (vitmax == vit % 1000)
+match += 10;
+				if (match < vit / 1000000)
+			{
+vitmax = vit % 1000;
+match = vit / 1000000;
+}
+
+					
+vit = traitementImage(saving);
+if (vitmax == vit % 1000)
+match += 10;
+if (match < vit / 1000000)
+			{
+vitmax = vit % 1000;
+match = vit / 1000000;
+}
+
+if (vitmax)
+{
+cout << vitmax << endl;
+playLimitation(std::to_string(vitmax));
+}
 			compt = 0;
-		}
+}
 		/*if (vitzone != vit / 1000)
 		  vitzone = vit / 1000;
 		  if (vit % 1000 != 0)

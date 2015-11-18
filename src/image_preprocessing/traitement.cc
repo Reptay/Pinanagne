@@ -75,7 +75,7 @@ int traitementImage(std::vector<Mat> panneaux)
 				default: maxvit = 50;
 			}
 			cout << "Vitesse maximale autorisée: " << maxvit << endl;
-			return vitzone*1000 + maxvit;
+			return vitzone*1000 + maxvit + 1000000 * matches[minpos];
 		}
 		return 0;
 //	}
