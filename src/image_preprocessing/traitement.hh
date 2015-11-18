@@ -14,6 +14,6 @@
 #include "../detection/detectRect.hh"
 #include <dirent.h>
 
-int traitementImage(Mat img);
+int traitementImage(std::vector<Mat> img);
 
 #endif

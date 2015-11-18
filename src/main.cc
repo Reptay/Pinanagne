@@ -54,7 +54,10 @@ bool fluxWebcam(std::string path)
 	int vitmax = 0;
 	int vitzone = 0;
 	int compt = 0;
-	vector<int> matchs = vector<int>(7, 0);
+	//vector<int> matchs = vector<int>(7, 0);
+	vector<Mat> save = vector<Mat>();
+	vector<Mat> sav = vector<Mat>();
+	vector<Mat> sa = vector<Mat>();
 	// Boucle tant que l'utilisateur n'appuie pas sur la touche q (ou Q)
 	while(key != 'q' && key != 'Q') {
 		// On récupère une image
@@ -66,71 +69,94 @@ bool fluxWebcam(std::string path)
 		std::vector<Circle*> circles=getCirclesByEllipses(img.clone());
 		std::vector<Mat> panneaux;
 
-		int vit = traitementImage(img);
-		if (vitzone != vit / 1000)
-			vitzone = vit / 1000;
-		if (vit % 1000 != 0)
-		{
-			matchs[((vit%1000)/10)%7]++;
-			compt = 0;
+		if (circles.size() > 1){ // PARALLELE
+			std::thread threads[circles.size()];
+			int iter = 0;    
+			for (std::vector<Circle*>::iterator it = circles.begin();
+					it != circles.end(); it++){
+				threads[iter] = std::thread(paralIsLimitation, img, *it,&panneaux);
+				iter++;
+			}
+			for (auto& th : threads) th.join();
 		}
-		if (vit % 1000 == 0)
-			compt++;
-		if (compt > 7)
-		{
-			int m = matchs[0];
-			int v = 0;
-			for (int i = 1; i < matchs.size(); i++)
-
-				if (m < matchs[i])
-				{
-					m = matchs[i];
-					v = i;
+		else{ // SEQUENTIEL
+			for (std::vector<Circle*>::iterator it = circles.begin();
+					it != circles.end(); it++){
+				Mat* m = isLimitation(img, *it);
+				if (m != NULL){
+					panneaux.push_back(*m); // panneau detecte
+					(*it)->draw(img,0,255,0);
 				}
-			if (v == 3 || v == 5)
-				vitmax = v * 10;
-			else
-				vitmax = (v + 7) *10;
-			if (m)
-				playLimitation(std::to_string(vitmax));		
-			matchs.clear();
-			matchs = vector<int>(7,0);
-			compt = 0;
-			key = cvWaitKey(1);
+				else
+					(*it)->draw(img);      
+			}
 		}
-		/*if (circles.size() > 1){ // PARALLELE
-		  std::thread threads[circles.size()];
-		  int iter = 0;    
-		  for (std::vector<Circle*>::iterator it = circles.begin();
-		  it != circles.end(); it++){
-		  threads[iter] = std::thread(paralIsLimitation, img, *it,&panneaux);
-		  iter++;
+		if (panneaux.size() != 0)
+		{
+			panneauDetecte=true;
+			compt = 0;
+			sa = sav;
+			sav = save;
+			save = panneaux;
+		}
+		else
+			compt++;
+		if (save.size() != 0 && compt > 20)
+		{
+			int vit = traitementImage(save);
+			if (vit%1000)
+				playLimitation(std::to_string(vit%1000));
+			else
+			{
+				vit = traitementImage(sav);
+				if (vit%1000)
+					playLimitation(std::to_string(vit%1000));
+				else
+				{
+					vit = traitementImage(sa);
+					if (vit%1000)
+						playLimitation(std::to_string(vit%1000));
+				}
+			}
+			compt = 0;
+		}
+		/*if (vitzone != vit / 1000)
+		  vitzone = vit / 1000;
+		  if (vit % 1000 != 0)
+		  {
+		  matchs[((vit%1000)/10)%7]++;
+		  compt = 0;
 		  }
-		  for (auto& th : threads) th.join();
+		  if (compt > 7)
+		  {
+		  int m = matchs[0];
+		  int v = 0;
+		  for (int i = 1; i < matchs.size(); i++)
+
+		  if (m < matchs[i])
+		  {
+		  m = matchs[i];
+		  v = i;
 		  }
-		  else{ // SEQUENTIEL
-		  for (std::vector<Circle*>::iterator it = circles.begin();
-		  it != circles.end(); it++){
-		  Mat* m = isLimitation(img, *it);
-		  if (m != NULL){
-		  panneaux.push_back(*m); // panneau detecte
-		  (*it)->draw(img,0,255,0);
-		  }
+		  if (v == 3 || v == 5)
+		  vitmax = v * 10;
 		  else
-		  (*it)->draw(img);      
-		  }
-		  }
-		  if (panneaux.size() > 0)
-		  panneauDetecte=true;
+		  vitmax = (v + 7) *10;
 
-		  for (std::vector<Mat>::iterator it = panneaux.begin();
-		  it != panneaux.end(); it++){
-		  namedWindow("Display", WINDOW_AUTOSIZE);
-		  imshow("Display", *it);
-		  }
+		  playLimitation(std::to_string(vitmax));		
+		  matchs.clear();
+		  matchs = vector<int>(7,0);
+		  compt = 0; 
+		  }*/
 
-		  IplImage image2=img;
-		  cvShowImage( "Webcam", &image2);
+		/*		  for (std::vector<Mat>::iterator it = panneaux.begin();
+				  it != panneaux.end(); it++){
+				  namedWindow("Display", WINDOW_AUTOSIZE);
+				  imshow("Display", *it);
+				  }
+
+				  IplImage image2=img;
+				  cvShowImage( "Webcam", &image2);
 		//waitKey(0); 
 		// On attend 10ms
 		key = cvWaitKey(1);*/
