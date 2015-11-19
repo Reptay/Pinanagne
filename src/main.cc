@@ -36,128 +36,130 @@ Mat*  paralIsLimitation(Mat img, Circle* circle, std::vector<Mat>* panneaux)
 
 bool fluxWebcam(std::string path)
 {
-	bool panneauDetecte = false;
-	//  path = "";
-	CvCapture *capture;
-	if (path.empty()) // pas testé pour la webcam
-		capture = cvCreateCameraCapture( CV_CAP_ANY );
-	else
-		capture = cvCreateFileCapture(path.c_str());
-	if (!capture) {
-		printf("Ouverture du flux vidéo impossible !\n");
-		std::cout << path << std::endl;
-		exit(1);
+  bool panneauDetecte = false;
+  //  path = "";
+  CvCapture *capture;
+  if (path.empty()) // pas testé pour la webcam
+    capture = cvCreateCameraCapture( CV_CAP_ANY );
+  else
+    capture = cvCreateFileCapture(path.c_str());
+  if (!capture) {
+    printf("Ouverture du flux vidéo impossible !\n");
+    std::cout << path << std::endl;
+    exit(1);
+  }
+  
+  char key;
+  IplImage *image;
+  int vitmax = 0;
+  int vitzone = 0;
+  int compt = 0;
+  int match = 0;
+  //vector<int> matchs = vector<int>(7, 0);
+  vector<Mat> save = vector<Mat>();
+  vector<Mat> sav = vector<Mat>();
+  vector<Mat> sa = vector<Mat>();
+  vector<Mat> saving = vector<Mat>();
+  // Boucle tant que l'utilisateur n'appuie pas sur la touche q (ou Q)
+  while(key != 'q' && key != 'Q') {
+    // On récupère une image
+    image = cvQueryFrame(capture);
+    Mat img = cvarrToMat(image);
+    if (img.empty())
+      break;
+    
+    std::vector<Circle*> circles=getCirclesByEllipses(img.clone());
+    std::vector<Mat> panneaux;
+    
+    if (circles.size() > 1){ // PARALLELE
+      std::thread threads[circles.size()];
+      int iter = 0;    
+      for (std::vector<Circle*>::iterator it = circles.begin();
+	   it != circles.end(); it++){
+	threads[iter] = std::thread(paralIsLimitation, img, *it,&panneaux);
+	iter++;
+      }
+      for (auto& th : threads) th.join();
+    }
+    else{ // SEQUENTIEL
+      for (std::vector<Circle*>::iterator it = circles.begin();
+	   it != circles.end(); it++){
+	Mat* m = isLimitation(img, *it);
+	if (m != NULL){
+	  panneaux.push_back(*m); // panneau detecte
+	  (*it)->draw(img,0,255,0);
 	}
+	else
+	  (*it)->draw(img);      
+      }
+    }
+    
+    
+    if (panneaux.size() != 0)
+      {
+	panneauDetecte=true;
+	compt = 0;
+	saving = sa;
+	sa = sav;
+	sav = save;
+	save = panneaux;
+      }
+    else if ( compt <= 20)
+      compt++;
+    if (save.size() != 0 && compt == 20)
+      {
+	int vit = traitementImage(save);
+	match = vit / 1000000;
+	vitmax = vit%1000;
+	vit = traitementImage(sav);
+	if (vitmax == vit % 1000)
+	  match += 10;
+	if (match < vit / 1000000)
+	  {
+	    vitmax = vit % 1000;
+	    match = vit / 1000000;
+	  }
+	
+	vit = traitementImage(sa);
+	if (vitmax == vit % 1000)
+	  match += 10;
+	if (match < vit / 1000000)
+	  {
+	    vitmax = vit % 1000;
+	    match = vit / 1000000;
+	  }
+	
+	
+	vit = traitementImage(saving);
+	if (vitmax == vit % 1000)
+	  match += 10;
+	if (match < vit / 1000000)
+	  {
+	    vitmax = vit % 1000;
+	    match = vit / 1000000;
+	  }
 
-	char key;
-	IplImage *image;
-	int vitmax = 0;
-	int vitzone = 0;
-	int compt = 0;
-	int match = 0;
-	//vector<int> matchs = vector<int>(7, 0);
-	vector<Mat> save = vector<Mat>();
-	vector<Mat> sav = vector<Mat>();
-	vector<Mat> sa = vector<Mat>();
-	vector<Mat> saving = vector<Mat>();
-	// Boucle tant que l'utilisateur n'appuie pas sur la touche q (ou Q)
-	while(key != 'q' && key != 'Q') {
-		// On récupère une image
-		image = cvQueryFrame(capture);
-		Mat img = cvarrToMat(image);
-		if (img.empty())
-			break;
-
-		std::vector<Circle*> circles=getCirclesByEllipses(img.clone());
-		std::vector<Mat> panneaux;
-
-		if (circles.size() > 1){ // PARALLELE
-			std::thread threads[circles.size()];
-			int iter = 0;    
-			for (std::vector<Circle*>::iterator it = circles.begin();
-					it != circles.end(); it++){
-				threads[iter] = std::thread(paralIsLimitation, img, *it,&panneaux);
-				iter++;
-			}
-			for (auto& th : threads) th.join();
-		}
-		else{ // SEQUENTIEL
-			for (std::vector<Circle*>::iterator it = circles.begin();
-					it != circles.end(); it++){
-				Mat* m = isLimitation(img, *it);
-				if (m != NULL){
-					panneaux.push_back(*m); // panneau detecte
-					(*it)->draw(img,0,255,0);
-				}
-				else
-					(*it)->draw(img);      
-			}
-		}
-		if (panneaux.size() != 0)
-		{
-			panneauDetecte=true;
-			compt = 0;
-			saving = sa;
-			sa = sav;
-			sav = save;
-			save = panneaux;
-		}
-		else
-			compt++;
-		if (save.size() != 0 && compt > 20)
-		{
-			int vit = traitementImage(save);
-			match = vit / 1000000;
-			vitmax = vit%1000;
-			vit = traitementImage(sav);
-			if (vitmax == vit % 1000)
-				match += 10;
-			if (match < vit / 1000000)
-			{
-vitmax = vit % 1000;
-match = vit / 1000000;
-}
-
-					vit = traitementImage(sa);
-if (vitmax == vit % 1000)
-match += 10;
-				if (match < vit / 1000000)
-			{
-vitmax = vit % 1000;
-match = vit / 1000000;
-}
-
-					
-vit = traitementImage(saving);
-if (vitmax == vit % 1000)
-match += 10;
-if (match < vit / 1000000)
-			{
-vitmax = vit % 1000;
-match = vit / 1000000;
-}
-
-if (vitmax)
-{
-cout << vitmax << endl;
-playLimitation(std::to_string(vitmax));
-}
-			compt = 0;
-}
-		/*if (vitzone != vit / 1000)
-		  vitzone = vit / 1000;
-		  if (vit % 1000 != 0)
-		  {
-		  matchs[((vit%1000)/10)%7]++;
-		  compt = 0;
-		  }
-		  if (compt > 7)
-		  {
-		  int m = matchs[0];
-		  int v = 0;
-		  for (int i = 1; i < matchs.size(); i++)
-
-		  if (m < matchs[i])
+	if (vitmax)
+	  {
+	    cout << vitmax << endl;
+	    playLimitation(std::to_string(vitmax));
+	  }
+	//compt = 0;
+      }
+    /*if (vitzone != vit / 1000)
+      vitzone = vit / 1000;
+      if (vit % 1000 != 0)
+      {
+      matchs[((vit%1000)/10)%7]++;
+      compt = 0;
+      }
+      if (compt > 7)
+      {
+      int m = matchs[0];
+      int v = 0;
+      for (int i = 1; i < matchs.size(); i++)
+      
+      if (m < matchs[i])
 		  {
 		  m = matchs[i];
 		  v = i;
@@ -178,18 +180,18 @@ playLimitation(std::to_string(vitmax));
 				  namedWindow("Display", WINDOW_AUTOSIZE);
 				  imshow("Display", *it);
 				  }
-
-				  IplImage image2=img;
-				  cvShowImage( "Webcam", &image2);
-		//waitKey(0); 
-		// On attend 10ms
-		key = cvWaitKey(1);*/
-	}
-
-	//cvReleaseCapture(&capture);
-	//cvDestroyWindow("Webcam");
-	//  exit(0);
-	return panneauDetecte;
+		*/
+    IplImage image2=img;
+    cvShowImage( "Webcam", &image2);
+    //waitKey(0); 
+    // On attend 10ms
+    key = cvWaitKey(1);
+  }
+  
+  //cvReleaseCapture(&capture);
+  //cvDestroyWindow("Webcam");
+  //  exit(0);
+  return panneauDetecte;
 }
 
 void ReadWebcam(char* path)
