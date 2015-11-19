@@ -52,11 +52,10 @@ bool fluxWebcam(std::string path)
 	char key;
 	IplImage *image;
 	int vitmax = 0;
-	int avitmax = 0;
+int avitmax = 0;
 	int vitzone = 0;
 	int compt = 0;
 	int match = 0;
-	int acu = 0;
 	//vector<int> matchs = vector<int>(7, 0);
 	vector<Mat> save = vector<Mat>();
 	vector<Mat> sav = vector<Mat>();
@@ -67,7 +66,7 @@ bool fluxWebcam(std::string path)
 		// On récupère une image
 		image = cvQueryFrame(capture);
 		Mat img = cvarrToMat(image);
-		if (acu % 2 == 0 &&  img.empty())
+		if (img.empty())
 			break;
 
 		std::vector<Circle*> circles=getCirclesByEllipses(img.clone());
@@ -95,6 +94,8 @@ bool fluxWebcam(std::string path)
 					(*it)->draw(img);      
 			}
 		}
+
+
 		if (panneaux.size() != 0)
 		{
 			panneauDetecte=true;
@@ -104,16 +105,16 @@ bool fluxWebcam(std::string path)
 			sav = save;
 			save = panneaux;
 		}
-		else
+		else if ( compt <= 20)
 			compt++;
-		if (save.size() != 0 && compt > 20)
+		if (save.size() != 0 && compt == 20)
 		{
 			int vit = traitementImage(save);
 			match = vit / 1000000;
 			vitmax = vit%1000;
 			vit = traitementImage(sav);
-			if (vitmax && vitmax == vit % 1000)
-				match += 2;
+			if (vitmax == vit % 1000)
+				match += 10;
 			if (match < vit / 1000000)
 			{
 				vitmax = vit % 1000;
@@ -121,8 +122,8 @@ bool fluxWebcam(std::string path)
 			}
 
 			vit = traitementImage(sa);
-			if (vitmax && vitmax == vit % 1000)
-				match += 2;
+			if (vitmax == vit % 1000)
+				match += 10;
 			if (match < vit / 1000000)
 			{
 				vitmax = vit % 1000;
@@ -131,8 +132,8 @@ bool fluxWebcam(std::string path)
 
 
 			vit = traitementImage(saving);
-			if (vitmax && vitmax == vit % 1000)
-				match += 2;
+			if (vitmax == vit % 1000)
+				match += 10;
 			if (match < vit / 1000000)
 			{
 				vitmax = vit % 1000;
@@ -161,6 +162,8 @@ bool fluxWebcam(std::string path)
 		  for (int i = 1; i < matchs.size(); i++)
 
 		  if (m < matchs[i])
+
+
 		  {
 		  m = matchs[i];
 		  v = i;
@@ -187,7 +190,7 @@ bool fluxWebcam(std::string path)
 		//waitKey(0); 
 		// On attend 10ms
 		key = cvWaitKey(1);*/
-	//	acu = acu % 2 + 1;
+		//	acu = acu % 2 + 1;
 	}
 
 	//cvReleaseCapture(&capture);
