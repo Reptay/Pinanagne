@@ -52,9 +52,11 @@ bool fluxWebcam(std::string path)
 	char key;
 	IplImage *image;
 	int vitmax = 0;
+	int avitmax = 0;
 	int vitzone = 0;
 	int compt = 0;
 	int match = 0;
+	int acu = 0;
 	//vector<int> matchs = vector<int>(7, 0);
 	vector<Mat> save = vector<Mat>();
 	vector<Mat> sav = vector<Mat>();
@@ -65,7 +67,7 @@ bool fluxWebcam(std::string path)
 		// On récupère une image
 		image = cvQueryFrame(capture);
 		Mat img = cvarrToMat(image);
-		if (img.empty())
+		if (acu % 2 == 0 &&  img.empty())
 			break;
 
 		std::vector<Circle*> circles=getCirclesByEllipses(img.clone());
@@ -110,40 +112,41 @@ bool fluxWebcam(std::string path)
 			match = vit / 1000000;
 			vitmax = vit%1000;
 			vit = traitementImage(sav);
-			if (vitmax == vit % 1000)
-				match += 10;
+			if (vitmax && vitmax == vit % 1000)
+				match += 2;
 			if (match < vit / 1000000)
 			{
-vitmax = vit % 1000;
-match = vit / 1000000;
-}
+				vitmax = vit % 1000;
+				match = vit / 1000000;
+			}
 
-					vit = traitementImage(sa);
-if (vitmax == vit % 1000)
-match += 10;
-				if (match < vit / 1000000)
+			vit = traitementImage(sa);
+			if (vitmax && vitmax == vit % 1000)
+				match += 2;
+			if (match < vit / 1000000)
 			{
-vitmax = vit % 1000;
-match = vit / 1000000;
-}
+				vitmax = vit % 1000;
+				match = vit / 1000000;
+			}
 
-					
-vit = traitementImage(saving);
-if (vitmax == vit % 1000)
-match += 10;
-if (match < vit / 1000000)
+
+			vit = traitementImage(saving);
+			if (vitmax && vitmax == vit % 1000)
+				match += 2;
+			if (match < vit / 1000000)
 			{
-vitmax = vit % 1000;
-match = vit / 1000000;
-}
+				vitmax = vit % 1000;
+				match = vit / 1000000;
+			}
 
-if (vitmax)
-{
-cout << vitmax << endl;
-playLimitation(std::to_string(vitmax));
-}
+			if (vitmax && avitmax != vitmax)
+			{
+				cout << vitmax << endl;
+				playLimitation(std::to_string(vitmax));
+				avitmax = vitmax;
+			}
 			compt = 0;
-}
+		}
 		/*if (vitzone != vit / 1000)
 		  vitzone = vit / 1000;
 		  if (vit % 1000 != 0)
@@ -184,6 +187,7 @@ playLimitation(std::to_string(vitmax));
 		//waitKey(0); 
 		// On attend 10ms
 		key = cvWaitKey(1);*/
+	//	acu = acu % 2 + 1;
 	}
 
 	//cvReleaseCapture(&capture);

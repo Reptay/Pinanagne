@@ -14,7 +14,7 @@ int findObject(Mat sceneP, Mat objectP, int minHessian, Scalar color, Mat outImg
 
 
 
-	SIFT sift(10,1);
+	SIFT sift(20,1);
 	Mat detector;
 	sift(objectP, Mat(), keypointsO, detector);
 	sift(sceneP, Mat(), keypointsS, detector);
