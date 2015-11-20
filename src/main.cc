@@ -56,7 +56,7 @@ int avitmax = 0;
 	int vitzone = 0;
 	int compt = 0;
 	int match = 0;
-	//vector<int> matchs = vector<int>(7, 0);
+//	vector<int> matches = vector<int>(7, 0);
 	vector<Mat> save = vector<Mat>();
 	vector<Mat> sav = vector<Mat>();
 	vector<Mat> sa = vector<Mat>();
@@ -147,6 +147,8 @@ int avitmax = 0;
 				avitmax = vitmax;
 			}
 			compt = 0;
+			match = 0;
+		//	matches = vector<int>(7,0);
 		}
 		/*if (vitzone != vit / 1000)
 		  vitzone = vit / 1000;
