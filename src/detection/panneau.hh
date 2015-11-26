@@ -12,6 +12,7 @@ public:
   Panneau(int limitation, long time);
   Panneau(int limitation, long minute, int seconds);
   long getTime();
+  std::string getTimeMinute();
   long getLimitation();
   std::string print();
 private:

@@ -69,15 +69,22 @@ void compareFile(std::string pVideo, std::string pRef)
 	panneauxBienDetectes++;
 	if (limitation == (*itr).getLimitation())
 	  limitationsBienLus++;
+	else
+	  std::cout << "-- Erreur reconnaissance : " << (*itv).print() << std::endl;
 	itr++;
       }
       else if ((*itr).getTime()<time){
+	std::cout << "- Panneau non detecte : " << (*itr).print() << std::endl;
 	itr++;
 	if (itr == ref.end())
 	  break;
 	else
 	  continue;
       }
+      else
+	{
+	  std::cout << "--- Faux positifs : " <<  (*itv).print() << std::endl;
+	}
       itv++;
     }
 

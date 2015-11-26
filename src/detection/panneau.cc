@@ -29,7 +29,10 @@ std::string Panneau::print()
   return str;
 }
 
-
+std::string Panneau::getTimeMinute()
+{
+  return secondsTominute();
+}
 
 std::string Panneau::secondsTominute()
 {
