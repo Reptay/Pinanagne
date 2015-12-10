@@ -99,7 +99,7 @@ std::vector<Panneau> fluxWebcam(std::string path)
       }
     }
     
-    
+ 	vector<int> vits = vector<int>(14);    
     if (panneaux.size() != 0)
       {
 	compt = 0;
@@ -115,7 +115,9 @@ std::vector<Panneau> fluxWebcam(std::string path)
 	int vit = traitementImage(save);
 	match = vit / 1000000;
 	vitmax = vit%1000;
+	vits[vitmax / 10] += match;
 	vit = traitementImage(sav);
+	vits[(vit % 1000) / 10] += vit / 1000000;
 	if (vitmax == vit % 1000)
 	  match += 10;
 	if (match < vit / 1000000)
@@ -124,6 +126,7 @@ std::vector<Panneau> fluxWebcam(std::string path)
 	    match = vit / 1000000;
 	  }
 	vit = traitementImage(sa);
+	vits[(vit % 1000) / 10] += vit / 1000000;
 	if (vitmax == vit % 1000)
 	  match += 10;
 	if (match < vit / 1000000)
@@ -132,6 +135,7 @@ std::vector<Panneau> fluxWebcam(std::string path)
 	    match = vit / 1000000;
 	  }	
 	vit = traitementImage(saving);
+	vits[(vit % 1000) / 10] += vit / 1000000;
 	if (vitmax == vit % 1000)
 	  match += 10;
 	if (match < vit / 1000000)
@@ -139,7 +143,15 @@ std::vector<Panneau> fluxWebcam(std::string path)
 	    vitmax = vit % 1000;
 	    match = vit / 1000000;
 	  }
-	
+	int m = 0;
+	for (int i = 0; i < 14; i++)
+	{
+		if (m < vits[i])
+		{
+			m = vits[i];
+			vitmax = i * 10;
+		}
+    }
 	if (vitmax && avitmax != vitmax)
 	  {
 	    cout << vitmax << endl;
