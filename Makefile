@@ -82,4 +82,4 @@ checkv2: all
 
 
 clean:
-	$(RM) $(OBJ) $(OBJ2) $(TARGET)
+	$(RM) $(OBJ) $(OBJ2) $(TARGET) test.txt
