@@ -84,3 +84,11 @@ Mat outimg = img;
 int n = findObject(img, label, 500, Scalar(255,0,0), outimg);
 return n > 0;
 }
+
+vect<Rect> getLines(Mat img)
+{
+//copie necessaire?
+	cvtColor(img, img, CV_BGR2GRAY);
+	threshold(img, img, 100, 255, THRESH_BINARY);
+	return detectRect(img);
+}
