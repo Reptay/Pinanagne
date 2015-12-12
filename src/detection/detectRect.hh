@@ -18,4 +18,5 @@ bool isCity(Mat img);
 bool isHighWay(Mat img);
 bool endCity(Mat img);
 bool endHighWay(Mat img);
+vector<Rect> getLines(Mat img);
 #endif
