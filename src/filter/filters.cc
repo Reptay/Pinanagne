@@ -221,3 +221,10 @@ Mat onlyBlack(Mat img)
 inRange(hsv, Scalar(0,0,0), Scalar(180,255,0), mask);
 return mask;
 }
+
+Mat Adaptbinar(Mat img)
+{
+	cvtColor(img, img, CV_BGR2GRAY);
+	adaptiveThreshold(img, img, 255, ADAPTIVE_THRESH_GAUSSIAN_C, THRESH_BINARY, 11 ,2);
+return img;
+}

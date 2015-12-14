@@ -31,8 +31,8 @@ int traitementImage(std::vector<Mat> panneaux)
 		for (std::vector<Mat>::iterator it = panneaux.begin();
 				it != panneaux.end(); it++){
 			DIR* d;
-			BlackFilter(*it);
-			//cvtColor(*it, *it, CV_BGR2GRAY);
+			Adaptbinar(*it);
+			//BlackFilter(*it);
 			d = opendir("./modeles/vitesse");
 			if (!d)
 				exit(1);
@@ -50,8 +50,8 @@ int traitementImage(std::vector<Mat> panneaux)
 						Mat outImg = *it;
 						if (outImg.data)
 						{
-							//cvtColor(mod, mod, CV_BGR2GRAY);
-							BlackFilter(*it);
+							//BlackFilter(*it);
+							Adaptbinar(mod);
 							int n = findObject(*it, mod, 500, Scalar(255,0,0), outImg);
 							matches.push_back(n);
 							cout <<"nombre match: "<< n << endl;

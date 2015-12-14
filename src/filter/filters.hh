@@ -25,4 +25,5 @@ void getOrientation(Mat& img);
 Point findcenter(Mat img, vector<vector<Point> >* ret);
 int nbWhitePix(Mat img);
 Mat onlyBlack(Mat img);
+Mat Adaptbinar(Mat img);
 #endif /*FILTERS_HH*/
