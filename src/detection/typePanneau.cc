@@ -78,7 +78,7 @@ Mat* isLimitation(Mat img, Circle* c)
   Mat* panneau = new Mat(2*hauteur, 2*largeur,CV_8UC3, Scalar(0,0,0));
   for (int i = cx-largeur; i < cx+largeur; i++)
     for (int j = cy-hauteur; j < cy+hauteur; j++){
-      if (i < 0 || j < 0)
+      if (i < 0 || j < 0 || i >= img.cols || j >= img.rows)
 	{
 	  Point3_<uchar>* pPan = panneau->ptr<Point3_<uchar>>(j-cy+hauteur,i-cx+largeur);
 	  pPan->x = 255;

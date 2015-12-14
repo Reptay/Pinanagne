@@ -73,6 +73,10 @@ std::vector<Panneau> fluxWebcam(std::string path)
     if (img.empty())
       break;
 
+    //if (posVideo<45500)
+    // continue;
+    //std::cout << posVideo<<std::endl;
+
     std::vector<Circle*> circles=getCirclesByEllipses(img.clone());
     std::vector<Mat> panneaux;
     
