@@ -302,8 +302,24 @@ int main(int argc, char* argv[])
 		<< std::endl;
     }
   else if (argc == 3 && strcmp(argv[1], "-i")==0)
-    {
-      int vitmax = 0;
+    {  
+	  Mat img;
+      img = imread(argv[2], CV_LOAD_IMAGE_COLOR);
+		if (img.data)
+{
+vector<RotatedRect> rects = getLines(img);
+Point2f rect_points[4];
+for (int i =0; i < rects.size(); i++)
+{
+rects[i].points(rect_points);
+for (int j = 0; j <4; j++)
+line( img, rect_points[j], rect_points[(j+1)%4], Scalar(255, 0, 0), 1, 8);
+}
+imshow("test",img);
+waitKey();
+	//	std::cout << getLines(img).size() << endl;
+}
+ /*     int vitmax = 0;
       int vitzone = 0;
       Mat img;
       img = imread(argv[2], CV_LOAD_IMAGE_COLOR);
@@ -322,7 +338,7 @@ int main(int argc, char* argv[])
 	} else {
 	return 1;
       }
-      return 2;
+      return 2;*/
     }
   else if (argc == 4 && strcmp(argv[1], "-c")==0) //compare 2 fichiers txt
     {

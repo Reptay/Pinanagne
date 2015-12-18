@@ -85,10 +85,30 @@ int n = findObject(img, label, 500, Scalar(255,0,0), outimg);
 return n > 0;
 }
 
-vector<Rect> getLines(Mat img)
+vector<RotatedRect> LinestoRect(Mat img)
+{
+	vector<RotatedRect> rects = vector<RotatedRect>();
+	vector<vector<Point> > contours;
+	findContours(img.clone(), contours, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE);
+	for (int i = 0; i < contours.size(); i++)
+{
+
+	RotatedRect r = minAreaRect(contours[i]);
+//if (r.size <= 100)
+	rects.push_back(r);
+
+}
+return rects;
+}
+
+vector<RotatedRect> getLines(Mat img)
 {
 //copie necessaire?
 	cvtColor(img, img, CV_BGR2GRAY);
-	threshold(img, img, 100, 255, THRESH_BINARY);
-	return detectRect(img);
+	threshold(img, img, 205, 255, THRESH_BINARY);
+	//img = WhiteFilter(img);
+	imshow("test", img);
+	waitKey();
+	//Mat copy = Mat(img, Rect(0,0,img.rows, img.cols)); 
+	return LinestoRect(img);
 }
