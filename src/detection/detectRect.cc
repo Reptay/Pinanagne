@@ -94,7 +94,9 @@ vector<RotatedRect> LinestoRect(Mat img)
 {
 
 	RotatedRect r = minAreaRect(contours[i]);
-//if (r.size <= 100)
+	double h = r.size.height;
+	double w = r.size.width;
+if (h * w > 2 && h * w < 500)
 	rects.push_back(r);
 
 }
@@ -105,7 +107,7 @@ vector<RotatedRect> getLines(Mat img)
 {
 //copie necessaire?
 	cvtColor(img, img, CV_BGR2GRAY);
-	threshold(img, img, 205, 255, THRESH_BINARY);
+	threshold(img, img, 175, 255, THRESH_BINARY);
 	//img = WhiteFilter(img);
 	imshow("test", img);
 	waitKey();
