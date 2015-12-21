@@ -94,9 +94,22 @@ vector<RotatedRect> LinestoRect(Mat img)
 {
 
 	RotatedRect r = minAreaRect(contours[i]);
+	Point2f rect_points[4];
+	r.points(rect_points);
+	int bl = 0;
+	for (int j = 0; j < 4; j ++)
+	{
+		double x = rect_points[j].x;
+		double y = rect_points[j].y;
+		if (x - 20 > 0 && img.at<Vec3b>(y, x -20).val[0] == 0)
+			bl++;
+	}
+	double a = r.angle;
 	double h = r.size.height;
 	double w = r.size.width;
-if (h * w > 2 && h * w < 500)
+if (h * w > 2 && h * w < 500 && bl >= 2 && 
+(( w > h && abs(a) >= 20 && w/h > 1 && w/h < 25) || 
+(h > w && abs(a) <= 70 &&  h/w > 1 && h/w < 25)))
 	rects.push_back(r);
 
 }
@@ -106,6 +119,8 @@ return rects;
 vector<RotatedRect> getLines(Mat img)
 {
 //copie necessaire?
+	//Decoupe image
+	//Mat cpy = Mat(img, Rect(0, img.rows / 2, img.cols, img.rows / 2)); 
 	cvtColor(img, img, CV_BGR2GRAY);
 	threshold(img, img, 175, 255, THRESH_BINARY);
 	//img = WhiteFilter(img);

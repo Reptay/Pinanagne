@@ -313,33 +313,16 @@ for (int i =0; i < rects.size(); i++)
 {
 rects[i].points(rect_points);
 for (int j = 0; j <4; j++)
+//Show rectangles
+{ 
 line( img, rect_points[j], rect_points[(j+1)%4], Scalar(255, 0, 0), 1, 8);
+}
 }
 imshow("test",img);
 waitKey();
 	//	std::cout << getLines(img).size() << endl;
 }
- /*     int vitmax = 0;
-      int vitzone = 0;
-      Mat img;
-      img = imread(argv[2], CV_LOAD_IMAGE_COLOR);
-      if (img.data)
-	{
-	  int vit = traitementImage(img);
-	  if (vit % 1000 != vitmax)
-	    {
-	      vitmax = vit % 1000;
-	      playLimitation(std::to_string(vitmax));
-	    }
-	  if (vit / 1000 != vitzone)
-	    vitzone = vit / 1000;
-	  //Comparaison avec les modeles via un surf
-	  return 0;
-	} else {
-	return 1;
-      }
-      return 2;*/
-    }
+   }
   else if (argc == 4 && strcmp(argv[1], "-c")==0) //compare 2 fichiers txt
     {
       compareFile(argv[2], argv[3]);
