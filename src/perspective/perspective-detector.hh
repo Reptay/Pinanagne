@@ -18,6 +18,7 @@ public:
     :focal_(focal), length_(length), scale_(scale)
   {}
   void computePos(double x1, double y1, double x2, double y2);
+  void expectNextPos(double speed, double time);//calculated speed, elapsed time
   double getX() const
   {
     return r_ * std::cos(phi_) * std::sin(theta_); //projette sur xoz puis sur x
@@ -34,6 +35,14 @@ public:
   {
     return r_;
   }
+  double getScreenX() const
+  {
+    return x_screen_;
+  }
+  double getScreenY() const
+  {
+    return y_screen_;
+  }
 private:
   double focal_;
   double length_;
@@ -41,6 +50,9 @@ private:
   double r_ = 0;
   double theta_ = 0;
   double phi_ = 0;
+  //to ease tracking
+  double x_screen_;
+  double y_screen_;
 };
 
 #endif //!PERSPECTIVE_DETECTOR_HH

@@ -37,3 +37,22 @@ void PerspectiveDetector::computePos(double x1, double y1, double x2, double y2)
   theta_ = std::atan2(x1, focal_); //actually pi/2 - theta => replace cos by sin
   phi_ = atan2(y1, focal_);
 }
+
+void PerspectiveDetector::expectNextPos(double speed, double time)
+{
+  double x = this->getX();
+  double y = this->getY();
+  double z = this->getZ();
+
+  z -= speed * time;
+
+  if (z <= focal_)
+    {
+      x_screen_ = -1;
+      y_screen_ = -1;
+      return;
+    }
+
+  x_screen_ = x * focal_ / z;
+  y_screen_ = y * focal_ / z;
+}
