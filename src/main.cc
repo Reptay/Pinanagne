@@ -204,6 +204,19 @@ std::vector<Panneau> fluxWebcam(std::string path)
 	    imshow("Display", *it);
 	    }
 	  */
+vector<RotatedRect> rects = getLines(img);
+Point2f rect_points[4];
+for (int i =0; i < rects.size(); i++)
+{
+rects[i].points(rect_points);
+for (int j = 0; j <4; j++)
+//Show rectangles
+{
+Point2f p1 = Point2f(rect_points[j].x, rect_points[j].y + img.rows / 2);
+Point2f p2 = Point2f(rect_points[(j+1)%4].x, rect_points[(j+1)%4].y + img.rows / 2);
+line( img, p1, p2, Scalar(255, 0, 0), 1, 8);
+}
+}
     IplImage image2=img;
     cvShowImage( "Webcam", &image2);
     //waitKey(0); 
@@ -314,8 +327,10 @@ for (int i =0; i < rects.size(); i++)
 rects[i].points(rect_points);
 for (int j = 0; j <4; j++)
 //Show rectangles
-{ 
-line( img, rect_points[j], rect_points[(j+1)%4], Scalar(255, 0, 0), 1, 8);
+{
+Point2f p1 = Point2f(rect_points[j].x, rect_points[j].y + img.rows / 2);
+Point2f p2 = Point2f(rect_points[(j+1)%4].x, rect_points[(j+1)%4].y + img.rows / 2);
+line( img, p1, p2, Scalar(255, 0, 0), 1, 8);
 }
 }
 imshow("test",img);

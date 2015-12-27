@@ -120,12 +120,12 @@ vector<RotatedRect> getLines(Mat img)
 {
 //copie necessaire?
 	//Decoupe image
-	//Mat cpy = Mat(img, Rect(0, img.rows / 2, img.cols, img.rows / 2)); 
-	cvtColor(img, img, CV_BGR2GRAY);
-	threshold(img, img, 175, 255, THRESH_BINARY);
+	Mat cpy = Mat(img, Rect(0, img.rows / 2, img.cols, img.rows / 2)); 
+	cvtColor(cpy, cpy, CV_BGR2GRAY);
+	threshold(cpy, cpy, 175, 255, THRESH_BINARY);
 	//img = WhiteFilter(img);
-	imshow("test", img);
-	waitKey();
+	/*imshow("test", img);
+	waitKey();*/
 	//Mat copy = Mat(img, Rect(0,0,img.rows, img.cols)); 
-	return LinestoRect(img);
+	return LinestoRect(cpy);
 }
