@@ -116,6 +116,27 @@ if (h * w > 2 && h * w < 500 && bl >= 2 &&
 return rects;
 }
 
+void printlines(Mat img)
+{
+	vector<Vec2f> lines;
+	HoughLines(img, lines, 1, CV_PI/180, 100, 0, 0);
+
+for (int j = 0; j < lines.size(); j++)
+{
+	float rho = lines[j][0], theta = lines[j][1];
+	double a = cos(theta), b = sin(theta);
+	double x0 = a * rho, y0 = b * rho;
+	Point p1, p2;
+	p1.x = cvRound(x0 - b * 1000);
+	p1.y = cvRound(y0 + 1000 * a);
+	p2.x = cvRound(x0 + b * 1000);
+	p2.y = cvRound(y0 - a * 1000);
+	line(img, p1, p2, Scalar(255,0,0), 1, 8);
+}
+	
+	imshow("test", img);
+	waitKey(); 
+}
 vector<RotatedRect> getLines(Mat img)
 {
 //copie necessaire?
@@ -123,6 +144,10 @@ vector<RotatedRect> getLines(Mat img)
 	Mat cpy = Mat(img, Rect(0, img.rows / 2, img.cols, img.rows / 2)); 
 	cvtColor(cpy, cpy, CV_BGR2GRAY);
 	threshold(cpy, cpy, 175, 255, THRESH_BINARY);
+	
+//Fonction de test pour juste les lignes
+	printlines(cpy);
+
 	//img = WhiteFilter(img);
 	/*imshow("test", img);
 	waitKey();*/
