@@ -118,6 +118,8 @@ return rects;
 
 void printlines(Mat img, int fi)
 {
+Mat dst;
+cvtColor(img, dst, CV_GRAY2BGR);
 if (fi == 0)
 {
 //Hough Transform
@@ -134,7 +136,7 @@ for (int j = 0; j < lines.size(); j++)
 	p1.y = cvRound(y0 + 1000 * a);
 	p2.x = cvRound(x0 + b * 1000);
 	p2.y = cvRound(y0 - a * 1000);
-	line(img, p1, p2, Scalar(255,0,0), 1, 8);
+	line(dst, p1, p2, Scalar(255,0,0), 1, 8);
 }
 }
 else
@@ -148,13 +150,13 @@ else
 			Vec4i l = lines[j];
 			Point p1 = Point(l[0], l[1]);
 			Point p2 = Point(l[2], l[3]);
-			line(img, p1, p2, Scalar(255, 0, 0), 1, 8);
+			line(dst, p1, p2, Scalar(255, 0, 0), 1, 8);
 		}
 	}
 	else
 		return;
 }
-	imshow("test", img);
+	imshow("test", dst);
 	waitKey(); 
 }
 vector<RotatedRect> getLines(Mat img)
@@ -166,7 +168,7 @@ vector<RotatedRect> getLines(Mat img)
 	threshold(cpy, cpy, 175, 255, THRESH_BINARY);
 	
 //Fonction de test pour juste les lignes(0 hough, 1 hough proba, autre entier rien)
-	//printlines(cpy, 2);
+	printlines(cpy, 1);
 
 	//img = WhiteFilter(img);
 	/*imshow("test", img);
