@@ -165,10 +165,10 @@ vector<RotatedRect> getLines(Mat img)
 	//Decoupe image
 	Mat cpy = Mat(img, Rect(0, img.rows / 2, img.cols, img.rows / 2)); 
 	cvtColor(cpy, cpy, CV_BGR2GRAY);
-	threshold(cpy, cpy, 175, 255, THRESH_BINARY);
+	threshold(cpy, cpy, 100, 255, THRESH_BINARY);
 	
 //Fonction de test pour juste les lignes(0 hough, 1 hough proba, autre entier rien)
-	printlines(cpy, 1);
+	printlines(cpy, 2);
 
 	//img = WhiteFilter(img);
 	/*imshow("test", img);
