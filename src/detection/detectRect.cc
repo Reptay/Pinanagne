@@ -101,7 +101,7 @@ vector<RotatedRect> LinestoRect(Mat img)
 	{
 		double x = rect_points[j].x;
 		double y = rect_points[j].y;
-		if (x - 20 > 0 && img.at<Vec3b>(y, x -20).val[0] == 0)
+		if (y > 0 && x - 20 > 0 && img.at<Vec3b>(y, x -20).val[0] == 0)
 			bl++;
 	}
 	double a = r.angle;
@@ -116,8 +116,11 @@ if (h * w > 2 && h * w < 500 && bl >= 2 &&
 return rects;
 }
 
-void printlines(Mat img)
+void printlines(Mat img, int fi)
 {
+if (fi == 0)
+{
+//Hough Transform
 	vector<Vec2f> lines;
 	HoughLines(img, lines, 1, CV_PI/180, 100, 0, 0);
 
@@ -133,7 +136,24 @@ for (int j = 0; j < lines.size(); j++)
 	p2.y = cvRound(y0 - a * 1000);
 	line(img, p1, p2, Scalar(255,0,0), 1, 8);
 }
-	
+}
+else
+{
+	if (fi == 1)
+	{
+		vector<Vec4i> lines;
+		HoughLinesP(img, lines, 1, CV_PI/180, 50, 50, 10);
+		for (int j = 0; j < lines.size(); j++)
+		{
+			Vec4i l = lines[j];
+			Point p1 = Point(l[0], l[1]);
+			Point p2 = Point(l[2], l[3]);
+			line(img, p1, p2, Scalar(255, 0, 0), 1, 8);
+		}
+	}
+	else
+		return;
+}
 	imshow("test", img);
 	waitKey(); 
 }
@@ -145,8 +165,8 @@ vector<RotatedRect> getLines(Mat img)
 	cvtColor(cpy, cpy, CV_BGR2GRAY);
 	threshold(cpy, cpy, 175, 255, THRESH_BINARY);
 	
-//Fonction de test pour juste les lignes
-	printlines(cpy);
+//Fonction de test pour juste les lignes(0 hough, 1 hough proba, autre entier rien)
+	//printlines(cpy, 2);
 
 	//img = WhiteFilter(img);
 	/*imshow("test", img);

@@ -328,8 +328,8 @@ rects[i].points(rect_points);
 for (int j = 0; j <4; j++)
 //Show rectangles
 {
-Point2f p1 = Point2f(rect_points[j].x, rect_points[j].y + img.rows / 2);
-Point2f p2 = Point2f(rect_points[(j+1)%4].x, rect_points[(j+1)%4].y + img.rows / 2);
+Point2f p1 = Point2f(rect_points[j].x, rect_points[j].y + img.rows / 2 - 1);
+Point2f p2 = Point2f(rect_points[(j+1)%4].x, rect_points[(j+1)%4].y + img.rows / 2 - 1);
 line( img, p1, p2, Scalar(255, 0, 0), 1, 8);
 }
 }
