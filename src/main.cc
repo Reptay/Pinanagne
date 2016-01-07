@@ -340,15 +340,22 @@ for (int j = 0; j <4; j++)
 {
 Point2f p1 = Point2f(rect_points[j].x, rect_points[j].y + img.rows / 2 - 1);
 Point2f p2 = Point2f(rect_points[(j+1)%4].x, rect_points[(j+1)%4].y + img.rows / 2 - 1);
-line( img, p1, p2, Scalar(255, 0, 0), 1, 8);
+ PerspectiveDetector p(1.5, FOCAL, SCALE);
+ p.computePos(p1.x, p1.y, p2.x, p2.y);
+ if (p.getDist() < 100)
+   line( img, p1, p2, Scalar(255, 0, 0), 1, 8);
+ else
+   line( img, p1, p2, Scalar(0, 255, 255), 1, 8);
 }
 
 Point2f p1 = Point2f(rect_points[1].x, rect_points[1].y + img.rows / 2 - 1);
 Point2f p2 = Point2f(rect_points[2].x, rect_points[2].y + img.rows / 2 - 1);
-line( img, p1, p2, Scalar(255, 255, 0), 1, 8);
  PerspectiveDetector p(1.5, FOCAL, SCALE);
  p.computePos(p1.x, p1.y, p2.x, p2.y);
  cout << "rectangle #" << i << " distance si ligne blanche : " << p.getDist() <<endl;
+ //if (p.getDist() < 100)
+ //  line( img, p1, p2, Scalar(255, 255, 0), 1, 8);
+
 }
 imshow("test",img);
 waitKey();
