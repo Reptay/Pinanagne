@@ -159,13 +159,45 @@ else
 	imshow("test", dst);
 	waitKey(); 
 }
+
+int getSeuil(Mat img)
+{
+	int col = 0;
+	if (img.data)
+	{
+		for (int i = 0; i < img.rows; i++)
+			for (int j = 0; j < img.cols; j++)
+			{
+				col += img.data[img.step[0] * i + img.step[1] * j];
+			}
+	}
+	col = col / (img.rows * img.cols);
+	/*if (col > 100)
+	{
+	float z = col * 1.33;
+	col = (int) z;
+	}
+	else
+	{
+		col = 100;
+	}*/
+	col += 50;
+	return col;
+}
+
 vector<RotatedRect> getLines(Mat img)
 {
 //copie necessaire?
 	//Decoupe image
-	Mat cpy = Mat(img, Rect(0, img.rows / 2, img.cols, img.rows / 2)); 
+	Mat cpy = Mat(img, Rect(0, img.rows / 2, img.cols, img.rows / 2));
+	/*Mat test = WhiteFilter(cpy);
+	imshow("youpla", test);
+	waitKey();*/
+	//cvtColor(cpy, cpy, CV_HSV2BGR);
 	cvtColor(cpy, cpy, CV_BGR2GRAY);
-	threshold(cpy, cpy, 100, 255, THRESH_BINARY);
+	int s = getSeuil(cpy);
+	std::cout << s << endl;
+	threshold(cpy, cpy, s, 255, THRESH_BINARY);
 	
 //Fonction de test pour juste les lignes(0 hough, 1 hough proba, autre entier rien)
 	printlines(cpy, 2);
