@@ -224,7 +224,12 @@ for (int j = 0; j <4; j++)
 {
 Point2f p1 = Point2f(rect_points[j].x, rect_points[j].y + img.rows / 2);
 Point2f p2 = Point2f(rect_points[(j+1)%4].x, rect_points[(j+1)%4].y + img.rows / 2);
-line( img, p1, p2, Scalar(255, 0, 0), 1, 8);
+ PerspectiveDetector p(1.5, FOCAL, SCALE);
+ p.computePos(p1.x, p1.y, p2.x, p2.y);
+ if (p.getDist() < 100)
+   line( img, p1, p2, Scalar(255, 0, 0), 1, 8);
+ else
+   line( img, p1, p2, Scalar(0, 255, 255), 1, 8);
 }
 }
     IplImage image2=img;
