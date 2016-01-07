@@ -14,6 +14,16 @@
 #include <dirent.h>
 #include "image_preprocessing/traitement.hh"
 #include "test/test.hh"
+#include "perspective/perspective-detector.hh"
+
+
+//info for perspective detector
+#define FOCAL 0.031 //focal distance
+#define SENSOR_SIZE FOCAL / 2.4 // Sensor size (width 0.0048, height 0.0036)
+#define SENSOR_PXL 1534.4380078712857//Sensor size in pixel (2304x1536)
+
+#define SCALE SENSOR_SIZE / SENSOR_PXL
+
 
 using namespace std;
 
@@ -332,6 +342,13 @@ Point2f p1 = Point2f(rect_points[j].x, rect_points[j].y + img.rows / 2 - 1);
 Point2f p2 = Point2f(rect_points[(j+1)%4].x, rect_points[(j+1)%4].y + img.rows / 2 - 1);
 line( img, p1, p2, Scalar(255, 0, 0), 1, 8);
 }
+
+Point2f p1 = Point2f(rect_points[1].x, rect_points[1].y + img.rows / 2 - 1);
+Point2f p2 = Point2f(rect_points[2].x, rect_points[2].y + img.rows / 2 - 1);
+line( img, p1, p2, Scalar(255, 255, 0), 1, 8);
+ PerspectiveDetector p(1.5, FOCAL, SCALE);
+ p.computePos(p1.x, p1.y, p2.x, p2.y);
+ cout << "rectangle #" << i << " distance si ligne blanche : " << p.getDist() <<endl;
 }
 imshow("test",img);
 waitKey();
