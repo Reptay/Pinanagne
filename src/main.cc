@@ -23,6 +23,7 @@
 #define SENSOR_PXL 1534.4380078712857//Sensor size in pixel (2304x1536)
 
 #define SCALE SENSOR_SIZE / SENSOR_PXL
+int echantillonnageVitesses = 30; // en seconde
 
 
 using namespace std;
@@ -46,9 +47,10 @@ Mat*  paralIsLimitation(Mat img, Circle* circle, std::vector<Mat>* panneaux)
 	}
 }
 
-std::vector<Panneau> fluxWebcam(std::string path)
+Test fluxWebcam(std::string path)
 {
   std::vector<Panneau> panneauxDetectes;
+  std::vector<int> vitessesDetectes;
   //  path = "";
   CvCapture *capture;
   if (path.empty()) // pas testé pour la webcam
@@ -243,7 +245,9 @@ Point2f p2 = Point2f(rect_points[(j+1)%4].x, rect_points[(j+1)%4].y + img.rows /
   cvReleaseCapture(&capture);
   cvDestroyWindow("Webcam");
   //  exit(0);
-  return panneauxDetectes;
+  vitessesDetectes.push_back(50);
+  vitessesDetectes.push_back(45);
+  return Test(panneauxDetectes, vitessesDetectes);
 }
 
 void ReadWebcam(char* path)
@@ -283,14 +287,26 @@ int main(int argc, char* argv[])
   if (argc == 1)
     fluxWebcam(""); //webcam
   else if (argc == 2){ // fichier video
-    std::vector<Panneau> panneauxDetectes = fluxWebcam(argv[1]);
-    panneauxToFile(panneauxDetectes);
+    Test test = fluxWebcam(argv[1]);
+    panneauxToFile(test.getPanneaux());
+    vitessesToFile(test.getVitesses());
   }
-  else if (argc == 4 && strcmp(argv[1], "-t")==0) //execute et compare
+  else if ((argc == 4 || argc == 5) && strcmp(argv[1], "-t")==0) //execute et compare
     {
-      std::vector<Panneau> panneauxDetectes = fluxWebcam(argv[2]);
-      panneauxToFile(panneauxDetectes);
-      compareFile("test.txt", argv[3]);//argv[3]);
+      if (argc == 5)
+	{
+	  int echRef = echantillonnnageRef(argv[4]);
+	  if (echRef != 0)
+	    echantillonnageVitesses = echRef;
+	}
+      std::cout << "Periode echantillonage vitesses : " << 
+	echantillonnageVitesses << " secondes"<< std::endl;
+      Test test = fluxWebcam(argv[2]);
+      panneauxToFile(test.getPanneaux());
+      vitessesToFile(test.getVitesses());
+      compareFilePanneaux("panTest.txt", argv[3]);//argv[3]);
+      if (argc == 5)
+	compareFileVitesses("vitTest.txt", argv[4]);
     }
   else if (argc == 3 && strcmp(argv[1], "-f")==0) // dossier de vidéos en parametre
     {
@@ -309,7 +325,7 @@ int main(int argc, char* argv[])
 	    printf ("%s\n", ent->d_name);
 	    std::string filename = directory+ent->d_name;
 	    std::cout << filename << std::endl;
-	    std::vector<Panneau> panneauxDetectes = fluxWebcam(filename);
+	    std::vector<Panneau> panneauxDetectes = fluxWebcam(filename).getPanneaux();
 	    if (panneauxDetectes.size()>0)
 	      nbDetecte ++;
 	    else
@@ -331,45 +347,50 @@ int main(int argc, char* argv[])
     }
   else if (argc == 3 && strcmp(argv[1], "-i")==0)
     {  
-	  Mat img;
+      Mat img;
       img = imread(argv[2], CV_LOAD_IMAGE_COLOR);
-		if (img.data)
-{
-vector<RotatedRect> rects = getLines(img);
-Point2f rect_points[4];
-for (int i =0; i < rects.size(); i++)
-{
-rects[i].points(rect_points);
-for (int j = 0; j <4; j++)
-//Show rectangles
-{
-Point2f p1 = Point2f(rect_points[j].x, rect_points[j].y + img.rows / 2 - 1);
-Point2f p2 = Point2f(rect_points[(j+1)%4].x, rect_points[(j+1)%4].y + img.rows / 2 - 1);
- PerspectiveDetector p(1.5, FOCAL, SCALE);
- p.computePos(p1.x, p1.y, p2.x, p2.y);
- if (p.getDist() < 100)
-   line( img, p1, p2, Scalar(255, 0, 0), 1, 8);
- else
-   line( img, p1, p2, Scalar(0, 255, 255), 1, 8);
-}
+      if (img.data)
+	{
+	  vector<RotatedRect> rects = getLines(img);
+	  Point2f rect_points[4];
+	  for (int i =0; i < rects.size(); i++)
+	    {
+	      rects[i].points(rect_points);
+	      for (int j = 0; j <4; j++)
+		//Show rectangles
+		{
+		  Point2f p1 = Point2f(rect_points[j].x, rect_points[j].y + img.rows / 2 - 1);
+		  Point2f p2 = Point2f(rect_points[(j+1)%4].x, rect_points[(j+1)%4].y + img.rows / 2 - 1);
+		  PerspectiveDetector p(1.5, FOCAL, SCALE);
+		  p.computePos(p1.x, p1.y, p2.x, p2.y);
+		  if (p.getDist() < 100)
+		    line( img, p1, p2, Scalar(255, 0, 0), 1, 8);
+		  else
+		    line( img, p1, p2, Scalar(0, 255, 255), 1, 8);
+		}
+	      
+	      Point2f p1 = Point2f(rect_points[1].x, rect_points[1].y + img.rows / 2 - 1);
+	      Point2f p2 = Point2f(rect_points[2].x, rect_points[2].y + img.rows / 2 - 1);
+	      PerspectiveDetector p(1.5, FOCAL, SCALE);
+	      p.computePos(p1.x, p1.y, p2.x, p2.y);
+	      cout << "rectangle #" << i << " distance si ligne blanche : " << p.getDist() <<endl;
+	      //if (p.getDist() < 100)
+	      //  line( img, p1, p2, Scalar(255, 255, 0), 1, 8);
 
-Point2f p1 = Point2f(rect_points[1].x, rect_points[1].y + img.rows / 2 - 1);
-Point2f p2 = Point2f(rect_points[2].x, rect_points[2].y + img.rows / 2 - 1);
- PerspectiveDetector p(1.5, FOCAL, SCALE);
- p.computePos(p1.x, p1.y, p2.x, p2.y);
- cout << "rectangle #" << i << " distance si ligne blanche : " << p.getDist() <<endl;
- //if (p.getDist() < 100)
- //  line( img, p1, p2, Scalar(255, 255, 0), 1, 8);
-
-}
-imshow("test",img);
-waitKey();
-	//	std::cout << getLines(img).size() << endl;
-}
-   }
+	    }
+	  imshow("test",img);
+	  waitKey();
+	  //	std::cout << getLines(img).size() << endl;
+	}
+    }
   else if (argc == 4 && strcmp(argv[1], "-c")==0) //compare 2 fichiers txt
     {
-      compareFile(argv[2], argv[3]);
+      compareFilePanneaux(argv[2], argv[3]);
+    }
+  else if (argc == 4 && strcmp(argv[1], "-cv")==0) // compare les vitesses
+    {
+      compareFileVitesses(argv[2], argv[3]);
+      //              fichierVideo, fichier de reference
     }
   else
     std::cerr << "Invalide argument" << std::endl;

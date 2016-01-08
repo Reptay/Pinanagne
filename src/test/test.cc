@@ -1,5 +1,11 @@
 #include "test.hh"
 
+Test::Test(std::vector<Panneau> p, std::vector<int> v)
+  : panneaux_(p), vitesses_(v){}
+std::vector<Panneau> Test::getPanneaux(){return panneaux_;}
+std::vector<int> Test::getVitesses(){return vitesses_;}
+
+
 Panneau ligneToPanneau(std::string ligne)
 {
   std::string limitation = ligne.substr(0, ligne.find(" "));
@@ -11,7 +17,7 @@ Panneau ligneToPanneau(std::string ligne)
 
 void panneauxToFile(std::vector<Panneau> panneaux)
 {
-  std::ofstream fichier("test.txt", std::ios::trunc);
+  std::ofstream fichier("panTest.txt", std::ios::trunc);
   if (fichier)
     {
       for (std::vector<Panneau>::iterator it = panneaux.begin() ;
@@ -23,10 +29,10 @@ void panneauxToFile(std::vector<Panneau> panneaux)
       fichier.close();
     }
   else
-    std::cerr << "test.cc : Ouverture du fichier impossible" << std::endl;
+    std::cerr << "test.cc panneauxToFile : Ouverture du fichier impossible" << std::endl;
 }
 
-void compareFile(std::string pVideo, std::string pRef)
+void compareFilePanneaux(std::string pVideo, std::string pRef)
 {
   std::ifstream fvideo(pVideo, std::ios::in);
   std::ifstream fref(pRef, std::ios::in);
@@ -48,7 +54,7 @@ void compareFile(std::string pVideo, std::string pRef)
       fref.close();
     }
   else{
-    std::cerr << "Test.cc : Impossible d'ouvrir le fichier !" << std::endl;
+    std::cerr << "Test.cc compareFilePanneaux : Impossible d'ouvrir le fichier !" << std::endl;
     return;
   }
 
@@ -98,3 +104,90 @@ void compareFile(std::string pVideo, std::string pRef)
   std::cout << "Faux positifs : " << fauxPositifs << " -> " <<
     (float)fauxPositifs/ref.size()*100<<"%"<<std::endl;
 }
+
+/************************************************
+ * VITESSE
+ ***********************************************/
+
+int echantillonnnageRef(std::string pRef)
+{
+  std::ifstream fref(pRef, std::ios::in);
+
+  int ech = 0;
+  if (fref)
+    {
+      std::string ligne;
+
+      if(getline(fref, ligne))
+        ech = std::stoi(ligne);
+
+      fref.close();
+    }
+  else{
+    std::cerr << "Test.cc echantillonnnageRef : Impossible d'ouvrir le fichier !" << std::endl;
+    return 0;
+  }
+  return ech;
+}
+
+void vitessesToFile(std::vector<int> vitesses)
+{
+  std::ofstream fichier("vitTest.txt", std::ios::trunc);
+  if (fichier)
+    {
+      for (std::vector<int>::iterator it = vitesses.begin() ;
+           it != vitesses.end(); it++)
+        {
+          fichier << (*it) << std::endl;
+        }
+
+      fichier.close();
+    }
+  else
+    std::cerr << "test.cc panneauxToFile : Ouverture du fichier impossible" << \
+      std::endl;
+}
+
+void compareFileVitesses(std::string pVideo, std::string pRef)
+{
+  std::ifstream fvideo(pVideo, std::ios::in);
+  std::ifstream fref(pRef, std::ios::in);
+
+  std::vector<int> video;
+  std::vector<int> ref;
+
+  if (fvideo && fref)
+    {
+      std::string ligne;
+      while(getline(fvideo, ligne))
+        {
+          video.push_back(std::stoi(ligne));
+        }
+      while(getline(fref, ligne))
+        ref.push_back(std::stoi(ligne));
+
+      fvideo.close();
+      fref.close();
+    }
+  else{
+    std::cerr << "Test.cc compareFileVitesse : Impossible d'ouvrir le fichier \
+!" << std::endl;
+    return;
+  }
+  ref.erase(ref.begin()); // supprime la premiere ligne (frequence)
+
+  int pos = 0;
+  double diff = 0;
+  while (pos < video.size() && pos < ref.size())
+    {
+      diff += abs(video[pos] - ref[pos]);
+      pos++;
+    }
+  std::cout << "======= VITESSE =======" << std::endl;
+  //std::cout << "diff " << " " << diff << std::endl;
+  double moyDiff = diff/pos;
+  std::cout << "Nombre de comparaison : " << pos << std::endl;
+  std::cout << "Moyenne des erreurs : ";
+  std::cout << moyDiff << "km/h"<< std::endl;
+}
+
