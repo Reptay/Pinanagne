@@ -393,7 +393,7 @@ int main(int argc, char* argv[])
       //              fichierVideo, fichier de reference
     }
   else
-    std::cerr << "Invalide argument" << std::endl;
+    std::cerr << "Invalid argument" << std::endl;
   
   Mix_CloseAudio();
 }
