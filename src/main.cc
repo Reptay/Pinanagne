@@ -221,6 +221,7 @@ Test fluxWebcam(std::string path)
     */
     lines_old = lines;
     lines= vector<Snapshot>();
+    double time=cvGetCaptureProperty(capture, CV_CAP_PROP_POS_MSEC);//en ms
     vector<RotatedRect> rects = getLines(img);
     Point2f rect_points[4];
     for (int i =0; i < rects.size(); i++)
@@ -236,7 +237,6 @@ Test fluxWebcam(std::string path)
             if (p.getDist() < 100)
               {
                 line( img, p1, p2, Scalar(255, 0, 0), 1, 8);
-                double time=cvGetCaptureProperty(capture, CV_CAP_PROP_POS_MSEC);//en ms
                 lines.emplace_back(p.getX(), p.getY(), p.getZ(), time / 1000);
               }
             else
@@ -247,11 +247,12 @@ Test fluxWebcam(std::string path)
     double sum_speed = 0;
     for (auto l1 : lines_old)
       {
+        //PerspectiveDetector p(1.5, FOCAL, SCALE);
         for (auto l2 : lines)
           {
-            if (abs(l1.get_x() - l2.get_x()) <= 1
+            if (abs(l1.get_x() - p.get_x()) <= 1
                 && abs(l1.get_y() - l2.get_y()) <= 1
-                && (l2 - l1) < 100)
+                && (l2 - l1) < 100 && (l2 - l1) > 0)
               {
                 nbspeed++;
                 sum_speed += Snapshot::mps_to_kph(l2 - l1);
