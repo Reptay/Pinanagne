@@ -1,6 +1,6 @@
-#include "speed.hh"
+#include "snapshot.hh"
 
-double Snapshot::operator-(const Snapshot& other)
+double Snapshot::operator-(const Snapshot& other) const
 {
   double dist = this->z_ - other.z_;
   //changer pour vrai distance après changement de repere;

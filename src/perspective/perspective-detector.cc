@@ -38,12 +38,9 @@ void PerspectiveDetector::computePos(double x1, double y1, double x2, double y2)
   phi_ = atan2(y1, focal_);
 }
 
-void PerspectiveDetector::expectNextPos(double speed, double time)
+void PerspectiveDetector::expectNextPos(double speed, double time,
+                                               double x, double y, double z)
 {
-  double x = this->getX();
-  double y = this->getY();
-  double z = this->getZ();
-
   z -= speed * time;
 
   if (z <= focal_)

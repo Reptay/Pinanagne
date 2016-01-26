@@ -18,7 +18,8 @@ public:
     :focal_(focal), length_(length), scale_(scale)
   {}
   void computePos(double x1, double y1, double x2, double y2);
-  void expectNextPos(double speed, double time);//calculated speed, elapsed time
+  void expectNextPos(double speed, double time, double x, double y, double z);
+  //calculated speed, elapsed time
   double getX() const
   {
     return r_ * std::cos(phi_) * std::sin(theta_); //projette sur xoz puis sur x
