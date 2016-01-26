@@ -250,7 +250,7 @@ Test fluxWebcam(std::string path)
         //PerspectiveDetector p(1.5, FOCAL, SCALE);
         for (auto l2 : lines)
           {
-            if (abs(l1.get_x() - p.get_x()) <= 1
+            if (abs(l1.get_x() - l2.get_x()) <= 1
                 && abs(l1.get_y() - l2.get_y()) <= 1
                 && (l2 - l1) < 100 && (l2 - l1) > 0)
               {
