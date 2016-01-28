@@ -242,6 +242,7 @@ Test fluxWebcam(std::string path)
               {
                 line( img, p1, p2, Scalar(255, 0, 0), 1, 8);
                 cout << "x : " << p.getX() << " y :"<< p.getY() << " z :" << p.getZ() << endl;
+                cout << " distance si ligne blanche : " << p.getDist() <<endl;
                 lines.emplace_back(p.getX(), p.getY(), p.getZ(), time / 1000);
                 double dist_min = MATCH_TOL;
                 double speed_match = -1;
