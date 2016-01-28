@@ -251,11 +251,12 @@ Test fluxWebcam(std::string path)
                                     l.get_x(), l.get_y(), l.get_z());
                     double dist = hypot(p1.x - p.getScreenX(),
                                         p1.y - p.getScreenY());
-                    if (dist < dist_min)
+                    double sp_cand = Snapshot(p.getX(), p.getY(),
+                                              p.getZ(), time / 1000) - l;
+                      if (dist < dist_min && sp_cand > 0)
                       {
                         dist = dist_min;
-                        speed_match = Snapshot(p.getX(), p.getY(),
-                                               p.getZ(), time / 1000) - l;
+                        speed_match = sp_cand;
                       }
                   }
                 if (speed_match > 0)
