@@ -241,8 +241,7 @@ Test fluxWebcam(std::string path)
             if (p.getDist() < 100 && p.getDist() > 1)
               {
                 line( img, p1, p2, Scalar(255, 0, 0), 1, 8);
-                cout << "x : " << p.getX() << " y :"<< p.getY() << " z :" << p.getZ() << endl;
-                cout << " distance si ligne blanche : " << p.getDist() <<endl;
+                cout << "x : " << p.getX() << " y :"<< p.getY() << " z :" << p.getZ() << "dist" <<p.getDist() << endl;
                 lines.emplace_back(p.getX(), p.getY(), p.getZ(), time / 1000);
                 double dist_min = MATCH_TOL;
                 double speed_match = -1;
@@ -435,7 +434,7 @@ int main(int argc, char* argv[])
               Point2f p2 = Point2f(rect_points[2].x, rect_points[2].y + img.rows / 2 - 1);
               PerspectiveDetector p(1.5, FOCAL, SCALE);
               p.computePos(p1.x, p1.y, p2.x, p2.y);
-              cout << "rectangle #" << i << " distance si ligne blanche : " << p.getDist() <<endl;
+              cout << "x : " << p.getX() << " y :"<< p.getY() << " z :" << p.getZ() << "dist" <<p.getDist() << endl;
               //if (p.getDist() < 100)
               //  line( img, p1, p2, Scalar(255, 255, 0), 1, 8);
 
