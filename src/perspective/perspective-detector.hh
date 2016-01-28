@@ -30,7 +30,7 @@ public:
   }
   double getZ() const
   {
-    return r_ * std::cos(phi_) * std::cos(theta_); //projette sur xoz puis sur z
+    return r_ * std::sin(phi_) * std::sin(theta_); //projette sur xoz puis sur z
   }
   double getDist() const
   {
