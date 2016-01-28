@@ -3,6 +3,7 @@
 #include <vector>
 #include <thread>         // std::thread
 #include <mutex>          // std::mutex
+#include <limits>
 #include "filter/filters.hh"
 #include "detection/shape.hh"
 #include "detection/typePanneau.hh"
@@ -25,7 +26,8 @@
 #define SCALE SENSOR_SIZE / SENSOR_PXL
 int echantillonnageVitesses = 30; // en seconde
 
-
+#define MATCH_TOL std::numeric_limits<double>::infinity()
+//distance maximale entre deux lignes blanches pour avoir une chance de match
 using namespace std;
 
 std::mutex mtx;
@@ -224,6 +226,8 @@ Test fluxWebcam(std::string path)
     double time=cvGetCaptureProperty(capture, CV_CAP_PROP_POS_MSEC);//en ms
     vector<RotatedRect> rects = getLines(img);
     Point2f rect_points[4];
+    int nbspeed = 0;
+    double sum_speed = 0;
     for (int i =0; i < rects.size(); i++)
       {
         rects[i].points(rect_points);
@@ -237,17 +241,39 @@ Test fluxWebcam(std::string path)
             if (p.getDist() < 100)
               {
                 line( img, p1, p2, Scalar(255, 0, 0), 1, 8);
+                cout << "x : " << p.getX() << " y :"<< p.getY() << " z :" << p.getZ() << endl;
                 lines.emplace_back(p.getX(), p.getY(), p.getZ(), time / 1000);
+                double dist_min = MATCH_TOL;
+                double speed_match = -1;
+                for (auto l : lines_old)
+                  {
+                    p.expectNextPos(est_speed, time - l.get_t(),
+                                    l.get_x(), l.get_y(), l.get_z());
+                    double dist = hypot(p1.x - p.getScreenX(),
+                                        p1.y - p.getScreenY());
+                    if (dist < dist_min)
+                      {
+                        dist = dist_min;
+                        speed_match = Snapshot(p.getX(), p.getY(),
+                                               p.getZ(), time / 1000) - l;
+                      }
+                  }
+                if (speed_match > 0)
+                  {
+                    nbspeed++;
+                    sum_speed += speed_match;
+                  }
               }
             else
               line( img, p1, p2, Scalar(0, 255, 255), 1, 8);
           }
       }
-    int nbspeed = 0;
-    double sum_speed = 0;
-    for (auto l1 : lines_old)
+    /*
+      for (auto l1 : lines_old)
       {
         //PerspectiveDetector p(1.5, FOCAL, SCALE);
+        const Snapshot* match;
+        double dist;
         for (auto l2 : lines)
           {
             if (abs(l1.get_x() - l2.get_x()) <= 1
@@ -255,12 +281,13 @@ Test fluxWebcam(std::string path)
                 && (l2 - l1) < 100 && (l2 - l1) > 0)
               {
                 nbspeed++;
-                sum_speed += Snapshot::mps_to_kph(l2 - l1);
+                sum_speed += l2 - l1;
               }
           }
       }
+    */
     est_speed = sum_speed / nbspeed;
-    cerr << "speed : " << est_speed << endl;
+    cerr << "speed : " << Snapshot::mps_to_kph(est_speed) << endl;
     IplImage image2=img;
     cvShowImage( "Webcam", &image2);
     //waitKey(0);
@@ -391,9 +418,12 @@ int main(int argc, char* argv[])
                   PerspectiveDetector p(1.5, FOCAL, SCALE);
                   p.computePos(p1.x, p1.y, p2.x, p2.y);
                   if (p.getDist() < 100)
-                    line( img, p1, p2, Scalar(255, 0, 0), 1, 8);
+                    {
+                      line(img, p1, p2, Scalar(255, 0, 0), 1, 8);
+                      cout << "x : " << p.getX() << " y :"<< p.getY() << " z :" << p.getZ() << endl;
+                    }
                   else
-                    line( img, p1, p2, Scalar(0, 255, 255), 1, 8);
+                    line(img, p1, p2, Scalar(0, 255, 255), 1, 8);
                 }
 
               Point2f p1 = Point2f(rect_points[1].x, rect_points[1].y + img.rows / 2 - 1);
