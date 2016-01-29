@@ -34,8 +34,9 @@ void PerspectiveDetector::computePos(double x1, double y1, double x2, double y2)
   //r_ = std::sin(psi - gamma) * length_ / std::sin(gamma); legacy
   //r_ = std::hypot(focal_, hypot(x1, y1) * scale_) * length_
   //  / (std::hypot(x1-x2, y1-y2) * scale_); //vetical detection
-  theta_ = std::atan2(x1, focal_); //actually pi/2 - theta => replace cos by sin
-  phi_ = atan2(y1, focal_);
+  theta_ = std::atan2(x1 * scale_, focal_); //actually pi/2 - theta => replace cos by sin
+  phi_ = atan2(hypot(x1 * scale_, focal_), y1 * scale_);
+  //  std::cout << "<" << theta_ << "|" << phi_ << ">" << std::endl;
 }
 
 void PerspectiveDetector::expectNextPos(double speed, double time,
