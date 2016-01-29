@@ -304,7 +304,7 @@ Test fluxWebcam(std::string path)
       est_speed = sum_speed / nbspeed;
     else
       cerr << "speed no_candidates" << endl;
-    cerr << "speed : " << Snapshot::mps_to_kph(est_speed) << endl;
+    cerr << "speed : " << Snapshot::mps_to_kph(est_speed) << " #lignes :" << nbspeed << endl;
     IplImage image2=img;
     cvShowImage( "Webcam", &image2);
     //waitKey(0);
