@@ -266,7 +266,7 @@ Test fluxWebcam(std::string path)
                                         p1.y - p.getScreenY());
                     double sp_cand = Snapshot(p.getX(), p.getY(),
                                               p.getZ(), time / 1000) - l;
-                      if (dist < dist_min && sp_cand > 0)
+                      if (dist < dist_min && sp_cand > 0 && sp_cand < 100)
                       {
                         dist = dist_min;
                         speed_match = sp_cand;
