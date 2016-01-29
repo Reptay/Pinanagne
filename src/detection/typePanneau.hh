@@ -9,6 +9,7 @@
 #include <unistd.h>
 #include <vector>
 #include <math.h>
+#include <utility>
 #include "circle.hh"
 #include "../filter/filters.hh"
 
@@ -16,6 +17,16 @@
  * Retourne l'image du panneau si c'est ok
  * Retourne NULL sinon
  */
-Mat* isLimitation(Mat img, Circle* c);
+struct sForme {
+  int size;
+  int hauteur;
+  int largeur;
+  int minx;
+  int miny;
+  int maxx;
+  int maxy;
+};
+
+std::pair<Mat*, std::vector<sForme>>* isLimitation(Mat img, Circle* c);
 
 #endif

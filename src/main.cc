@@ -31,13 +31,18 @@ int echantillonnageVitesses = 30; // en seconde
 using namespace std;
 
 std::mutex mtx;
-Mat*  paralIsLimitation(Mat img, Circle* circle, std::vector<Mat>* panneaux)
+Mat*  paralIsLimitation(Mat img, Circle* circle, std::vector<Mat>* panneaux,
+			std::vector<std::vector<sForme>>* sformes)
 {
-  Mat* m = isLimitation(img, circle);
-  if (m != NULL)
+  std::pair<Mat*, std::vector<sForme>>* matForme = isLimitation(img, circle);
+  Mat* m = NULL;
+  if (matForme != NULL)
+    m = matForme->first;
+  if (matForme != NULL && m != NULL)
     {
       mtx.lock();
       panneaux->push_back(*m);
+      sformes->push_back(matForme->second);
       circle->draw(img,0,255,0);
       mtx.unlock();
     }
@@ -96,13 +101,16 @@ Test fluxWebcam(std::string path)
 
     std::vector<Circle*> circles=getCirclesByEllipses(img.clone());
     std::vector<Mat> panneaux;
+    std::vector<std::vector<sForme>> sformes;
+
 
     if (circles.size() > 1){ // PARALLELE
       std::thread threads[circles.size()];
       int iter = 0;
       for (std::vector<Circle*>::iterator it = circles.begin();
            it != circles.end(); it++){
-        threads[iter] = std::thread(paralIsLimitation, img, *it,&panneaux);
+        threads[iter] = std::thread(paralIsLimitation, img, *it,&panneaux
+				    , &sformes);
         iter++;
       }
       for (auto& th : threads) th.join();
@@ -110,9 +118,14 @@ Test fluxWebcam(std::string path)
     else{ // SEQUENTIEL
       for (std::vector<Circle*>::iterator it = circles.begin();
            it != circles.end(); it++){
-        Mat* m = isLimitation(img, *it);
-        if (m != NULL){
+
+       std::pair<Mat*, std::vector<sForme>>* matForme = isLimitation(img, *it);
+	Mat* m = NULL;
+	if (matForme != NULL)
+	  m = matForme->first;
+        if (matForme != NULL && m != NULL){
           panneaux.push_back(*m); // panneau detecte
+	  sformes.push_back(matForme->second);
           (*it)->draw(img,0,255,0);
         }
         else

@@ -5,15 +5,7 @@ bool vrb = false;//true;//false; // Mode verbeux
 int getHauteur(Mat imgRed, int rayonFlou, int cx, int cy, int &minBande);
 int getLargeur(Mat imgRed, int rayonFlou, int cx, int cy, int &minBande);
 void supprimeFond(Mat *img, Circle* c);
-struct sForme {
-  int size;
-  int hauteur;
-  int largeur;
-  int minx;
-  int miny;
-  int maxx;
-  int maxy;
-};
+
 std::vector<sForme> nbCouleurContinu(Mat *img, int c);
 int min(int a, int b){
   if (a<b)
@@ -32,7 +24,7 @@ double compare(int a, int b)
 }
 
 
-Mat* isLimitation(Mat img, Circle* c)
+std::pair<Mat*, std::vector<sForme>>* isLimitation(Mat img, Circle* c)
 {
   if (c == NULL)
     return NULL;
@@ -159,7 +151,10 @@ Mat* isLimitation(Mat img, Circle* c)
      std::cout << "---> " << hauteur*2 << " "<<formes[0].hauteur << std::endl;
 
    supprimeFond(panneau, c2);
-   return panneau;
+
+   std::pair<Mat*, std::vector<sForme>>* matForme =
+     new std::pair<Mat*, std::vector<sForme>>(panneau, formes);
+   return matForme;
 }
 
 
