@@ -49,7 +49,7 @@ Mat*  paralIsLimitation(Mat img, Circle* circle, std::vector<Mat>* panneaux,
   else
     {
       mtx.lock();
-      circle->draw(img);
+      //circle->draw(img);
       mtx.unlock();
     }
 }
@@ -128,8 +128,8 @@ Test fluxWebcam(std::string path)
 	  sformes.push_back(matForme->second);
           (*it)->draw(img,0,255,0);
         }
-        else
-          (*it)->draw(img);
+        //else
+	//(*it)->draw(img);
       }
     }
 
