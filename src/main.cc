@@ -85,6 +85,7 @@ Test fluxWebcam(std::string path)
   vector<Mat> sav = vector<Mat>();
   vector<Mat> sa = vector<Mat>();
   vector<Mat> saving = vector<Mat>();
+    vector<vector<vector<sForme> > > forms = vector<vector<vector<sForme> > >(4);
   // Boucle tant que l'utilisateur n'appuie pas sur la touche q (ou Q)
   double posVideo = -1;
   while(key != 'q' && key != 'Q') {
@@ -138,19 +139,23 @@ Test fluxWebcam(std::string path)
       {
         compt = 0;
         saving = sa;
+        forms[3] = forms[2];
         sa = sav;
+        forms[2] = forms[1];
         sav = save;
+        forms[1] = forms[0];
         save = panneaux;
+        forms[0] = sformes;
       }
     else if ( compt <= 20)
       compt++;
     if (save.size() != 0 && compt == 20)
       {
-        int vit = traitementImage(save);
+        int vit = traitementImage(save, forms[0]);
         match = vit / 1000000;
         vitmax = vit%1000;
         vits[vitmax / 10] += match;
-        vit = traitementImage(sav);
+        vit = traitementImage(sav, forms[1]);
         vits[(vit % 1000) / 10] += vit / 1000000;
         if (vitmax == vit % 1000)
           match += 10;
@@ -159,7 +164,7 @@ Test fluxWebcam(std::string path)
             vitmax = vit % 1000;
             match = vit / 1000000;
           }
-        vit = traitementImage(sa);
+        vit = traitementImage(sa, forms[2]);
         vits[(vit % 1000) / 10] += vit / 1000000;
         if (vitmax == vit % 1000)
           match += 10;
@@ -168,7 +173,7 @@ Test fluxWebcam(std::string path)
             vitmax = vit % 1000;
             match = vit / 1000000;
           }
-        vit = traitementImage(saving);
+        vit = traitementImage(saving, forms[3]);
         vits[(vit % 1000) / 10] += vit / 1000000;
         if (vitmax == vit % 1000)
           match += 10;
@@ -196,45 +201,7 @@ Test fluxWebcam(std::string path)
         double time=cvGetCaptureProperty(capture, CV_CAP_PROP_POS_MSEC);//en ms
         panneauxDetectes.push_back(Panneau(vitmax, (long)round(time/1000)));
       }
-
-    /*if (vitzone != vit / 1000)
-      vitzone = vit / 1000;
-      if (vit % 1000 != 0)
-      {
-      matchs[((vit%1000)/10)%7]++;
-      compt = 0;
-      }
-      if (compt > 7)
-      {
-      int m = matchs[0];
-      int v = 0;
-      for (int i = 1; i < matchs.size(); i++)
-
-      if (m < matchs[i])
-
-
-      {
-      m = matchs[i];
-      v = i;
-      }
-      if (v == 3 || v == 5)
-      vitmax = v * 10;
-      else
-      vitmax = (v + 7) *10;
-
-      playLimitation(std::to_string(vitmax));
-      matchs.clear();
-      matchs = vector<int>(7,0);
-      compt = 0;
-      }*/
-
-    /*for (std::vector<Mat>::iterator it = panneaux.begin();
-      it != panneaux.end(); it++){
-      namedWindow("Display", WINDOW_AUTOSIZE);
-      imshow("Display", *it);
-      }
-    */
-    lines_old = lines;
+ lines_old = lines;
     lines= vector<Snapshot>();
     double time=cvGetCaptureProperty(capture, CV_CAP_PROP_POS_MSEC);//en ms
     vector<RotatedRect> rects = getLines(img);
@@ -254,7 +221,7 @@ Test fluxWebcam(std::string path)
             if (p.getDist() < 100 && p.getDist() > 1)
               {
                 line( img, p1, p2, Scalar(255, 0, 0), 1, 8);
-                cout << "x : " << p.getX() << " y :"<< p.getY() << " z :" << p.getZ() << "dist" <<p.getDist() << endl;
+   //             cout << "x : " << p.getX() << " y :"<< p.getY() << " z :" << p.getZ() << "dist" <<p.getDist() << endl;
                 lines.emplace_back(p.getX(), p.getY(), p.getZ(), time / 1000);
                 double dist_min = MATCH_TOL;
                 double speed_match = -1;
@@ -304,7 +271,7 @@ Test fluxWebcam(std::string path)
       est_speed = sum_speed / nbspeed;
     else
       cerr << "speed no_candidates" << endl;
-    cerr << "speed : " << Snapshot::mps_to_kph(est_speed) << " #lignes :" << nbspeed << endl;
+    //cerr << "speed : " << Snapshot::mps_to_kph(est_speed) << " #lignes :" << nbspeed << endl;
     IplImage image2=img;
     cvShowImage( "Webcam", &image2);
     //waitKey(0);
@@ -370,8 +337,8 @@ int main(int argc, char* argv[])
           if (echRef != 0)
             echantillonnageVitesses = echRef;
         }
-      std::cout << "Periode echantillonage vitesses : " <<
-        echantillonnageVitesses << " secondes"<< std::endl;
+      /*std::cout << "Periode echantillonage vitesses : " <<
+        echantillonnageVitesses << " secondes"<< std::endl;*/
       Test test = fluxWebcam(argv[2]);
       panneauxToFile(test.getPanneaux());
       vitessesToFile(test.getVitesses());

@@ -31,6 +31,8 @@ int findObject(Mat sceneP, Mat objectP, int minHessian, Scalar color, Mat outImg
   //-- Step 3: Matching descriptor vectors using FLANN matcher
   FlannBasedMatcher matcher;  
   std::vector< DMatch > matches;
+  if (descriptors_object.empty() || descriptors_scene.empty())
+      return 0;
   matcher.match( descriptors_object, descriptors_scene, matches );
 
   double max_dist = 0; double min_dist = 150;

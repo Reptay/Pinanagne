@@ -14,6 +14,8 @@
 #include "../detection/detectRect.hh"
 #include <dirent.h>
 
-int traitementImage(std::vector<Mat> img);
+using namespace std;
+
+int traitementImage(std::vector<Mat> img, vector<vector<sForme> > forms);
 
 #endif

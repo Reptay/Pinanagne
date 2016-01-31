@@ -196,7 +196,7 @@ vector<RotatedRect> getLines(Mat img)
 	//cvtColor(cpy, cpy, CV_HSV2BGR);
 	cvtColor(cpy, cpy, CV_BGR2GRAY);
 	int s = getSeuil(cpy);
-	std::cout << s << endl;
+	//std::cout << s << endl;
 	threshold(cpy, cpy, s, 255, THRESH_BINARY);
 	
 //Fonction de test pour juste les lignes(0 hough, 1 hough proba, autre entier rien)
