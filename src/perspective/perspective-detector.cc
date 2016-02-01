@@ -36,7 +36,7 @@ void PerspectiveDetector::computePos(double x1, double y1, double x2, double y2)
   //  / (std::hypot(x1-x2, y1-y2) * scale_); //vetical detection
   theta_ = std::atan2(x1 * scale_, focal_); //actually pi/2 - theta => replace cos by sin
   phi_ = atan2(hypot(x1 * scale_, focal_), y1 * scale_);
-  //  std::cout << "<" << theta_ << "|" << phi_ << ">" << std::endl;
+  //std::cout << "<" << theta_ << "|" << phi_ << ">" << std::endl;
 }
 
 void PerspectiveDetector::expectNextPos(double speed, double time,
@@ -51,6 +51,6 @@ void PerspectiveDetector::expectNextPos(double speed, double time,
       return;
     }
 
-  x_screen_ = x * focal_ / z;
-  y_screen_ = y * focal_ / z;
+  x_screen_ = focal_ / (z * x);
+  y_screen_ = focal_ / (z * y);
 }

@@ -229,6 +229,8 @@ Test fluxWebcam(std::string path)
                   {
                     p.expectNextPos(est_speed, time - l.get_t(),
                                     l.get_x(), l.get_y(), l.get_z());
+                    if (p.getScreenX() < 0 && p.getScreenY < 0)
+                      continue;
                     double dist = hypot(p1.x - p.getScreenX(),
                                         p1.y - p.getScreenY());
                     double sp_cand = Snapshot(p.getX(), p.getY(),
@@ -271,7 +273,7 @@ Test fluxWebcam(std::string path)
       est_speed = sum_speed / nbspeed;
     else
       cerr << "speed no_candidates" << endl;
-    //cerr << "speed : " << Snapshot::mps_to_kph(est_speed) << " #lignes :" << nbspeed << endl;
+    cerr << "speed : " << Snapshot::mps_to_kph(est_speed) << " #lignes :" << nbspeed << endl;
     IplImage image2=img;
     cvShowImage( "Webcam", &image2);
     //waitKey(0);
