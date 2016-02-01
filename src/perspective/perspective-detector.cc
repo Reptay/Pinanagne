@@ -51,6 +51,6 @@ void PerspectiveDetector::expectNextPos(double speed, double time,
       return;
     }
 
-  x_screen_ = focal_ / (z * x);
-  y_screen_ = focal_ / (z * y);
+  x_screen_ = (focal_ / z) * x;
+  y_screen_ = (focal_ / z) * y;
 }
