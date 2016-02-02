@@ -229,8 +229,8 @@ Test fluxWebcam(std::string path)
                   {
                     p.expectNextPos(est_speed, time - l.get_t(),
                                     l.get_x(), l.get_y(), l.get_z());
-                    std::cerr << p.getScreenX() << ","<< p.getScreenY() << std::endl
-                      if (p.getScreenX() < 0 && p.getScreenY() < 0)
+
+                    if (p.getScreenX() < 0 && p.getScreenY() < 0)
                       continue;
                     double dist = hypot(p1.x - p.getScreenX(),
                                         p1.y - p.getScreenY());
