@@ -85,7 +85,7 @@ Test fluxWebcam(std::string path)
   vector<Mat> sav = vector<Mat>();
   vector<Mat> sa = vector<Mat>();
   vector<Mat> saving = vector<Mat>();
-    vector<vector<vector<sForme> > > forms = vector<vector<vector<sForme> > >(4);
+  vector<vector<vector<sForme> > > forms = vector<vector<vector<sForme> > >(4);
   // Boucle tant que l'utilisateur n'appuie pas sur la touche q (ou Q)
   double posVideo = -1;
   while(key != 'q' && key != 'Q') {
@@ -221,14 +221,16 @@ Test fluxWebcam(std::string path)
             if (p.getDist() < 100 && p.getDist() > 1)
               {
                 line( img, p1, p2, Scalar(255, 0, 0), 1, 8);
-   //             cout << "x : " << p.getX() << " y :"<< p.getY() << " z :" << p.getZ() << "dist" <<p.getDist() << endl;
                 lines.emplace_back(p.getX(), p.getY(), p.getZ(), time / 1000);
                 double dist_min = MATCH_TOL;
                 double speed_match = -1;
                 for (auto l : lines_old)
                   {
-                    p.expectNextPos(est_speed, time - l.get_t(),
+                    p.expectNextPos(est_speed, time / 1000 - l.get_t(),
                                     l.get_x(), l.get_y(), l.get_z());
+
+                    if (p.getScreenX() < 0 && p.getScreenY() < 0)
+                      continue;
                     double dist = hypot(p1.x - p.getScreenX(),
                                         p1.y - p.getScreenY());
                     double sp_cand = Snapshot(p.getX(), p.getY(),
@@ -271,7 +273,7 @@ Test fluxWebcam(std::string path)
       est_speed = sum_speed / nbspeed;
     else
       cerr << "speed no_candidates" << endl;
-    //cerr << "speed : " << Snapshot::mps_to_kph(est_speed) << " #lignes :" << nbspeed << endl;
+    cerr << "speed : " << Snapshot::mps_to_kph(est_speed) << " #lignes :" << nbspeed << endl;
     IplImage image2=img;
     cvShowImage( "Webcam", &image2);
     //waitKey(0);
