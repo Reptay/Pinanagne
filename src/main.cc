@@ -214,8 +214,8 @@ Test fluxWebcam(std::string path)
         for (int j = 0; j <4; j++)
           //Show rectangles
           {
-            Point2f p1 = Point2f(rect_points[j].x, rect_points[j].y + img.rows / 2);
-            Point2f p2 = Point2f(rect_points[(j+1)%4].x, rect_points[(j+1)%4].y + img.rows / 2);
+            Point2f p1 = Point2f(rect_points[j].x, rect_points[j].y + 3* img.rows / 5);
+            Point2f p2 = Point2f(rect_points[(j+1)%4].x, rect_points[(j+1)%4].y + 3*img.rows / 5);
             PerspectiveDetector p(1.5, FOCAL, SCALE);
             p.computePos(p1.x, p1.y, p2.x, p2.y);
             if (p.getDist() < 100 && p.getDist() > 1)

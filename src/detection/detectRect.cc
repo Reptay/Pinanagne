@@ -189,7 +189,7 @@ vector<RotatedRect> getLines(Mat img)
 {
 //copie necessaire?
 	//Decoupe image
-	Mat cpy = Mat(img, Rect(0, img.rows / 2, img.cols, img.rows / 2));
+	Mat cpy = Mat(img, Rect(0, 3 * img.rows / 5, img.cols, 2 * img.rows / 5));
 	/*Mat test = WhiteFilter(cpy);
 	imshow("youpla", test);
 	waitKey();*/
@@ -201,7 +201,7 @@ vector<RotatedRect> getLines(Mat img)
 	
 //Fonction de test pour juste les lignes(0 hough, 1 hough proba, autre entier rien)
 	printlines(cpy, 2);
-
+ //   printlines(cpy,0);
 	//img = WhiteFilter(img);
 	/*imshow("test", img);
 	waitKey();*/
